@@ -1,0 +1,7 @@
+dist/**/*.js
+package.json
+package-lock.json
+*.html
+*.css
+*.scss
+*.md
