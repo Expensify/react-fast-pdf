@@ -22,10 +22,6 @@
     "url": "https://github.com/Expensify/react-fast-pdf/issues"
   },
   "homepage": "https://github.com/Expensify/react-fast-pdf#readme",
-  "dependencies": {
-    "react-pdf": "^7.3.0",
-    "react-window": "^1.8.9"
-  },
   "peerDependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
