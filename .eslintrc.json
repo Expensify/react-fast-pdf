@@ -5,6 +5,7 @@
         "jest": true
     },
     "extends": [
+        "expensify",
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
         "plugin:react/recommended",
