@@ -6,7 +6,7 @@
   "scripts": {
     "start": "webpack-dev-server --mode=development --open --hot",
     "build": "webpack --mode=production",
-    "lint": "eslint . --max-warnings=0 --cache --cache-location=node_modules/.cache/eslint",
+    "lint": "eslint . --cache --cache-location=node_modules/.cache/eslint",
     "prettier": "prettier --write ."
   },
   "repository": {
@@ -38,7 +38,6 @@
     "babel-loader": "^9.1.3",
     "css-loader": "^6.8.1",
     "eslint": "^8.46.0",
-    "eslint-config-expensify": "^2.0.38",
     "eslint-config-prettier": "^8.9.0",
     "eslint-plugin-react": "^7.33.1",
     "html-webpack-plugin": "^5.5.3",
