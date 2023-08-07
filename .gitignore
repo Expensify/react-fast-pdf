@@ -1,2 +1,10 @@
-node_modules
-dist
+# OSX
+.DS_Store
+
+# node.js
+node_modules/
+npm-debug.log
+dist/
+
+# NPM file created by GitHub actions
+.npmrc
