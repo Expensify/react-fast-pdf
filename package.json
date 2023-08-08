@@ -8,8 +8,7 @@
     "src"
   ],
   "scripts": {
-    "start": "webpack-dev-server --mode=development --open --hot",
-    "build": "webpack --mode=production",
+    "build": "npx tsc",
     "lint": "eslint src --fix",
     "ts": "npx tsc --noEmit",
     "prettier": "prettier --write .",

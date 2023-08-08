@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
@@ -12,6 +13,7 @@ module.exports = {
         alias: {
             react: path.join(__dirname, 'node_modules', 'react'),
         },
+        extensions: ['.tsx', '.ts', '.js'],
     },
     devServer: {
         port: 8080,
@@ -38,9 +40,6 @@ module.exports = {
                 use: ['style-loader', 'css-loader'],
             },
         ],
-    },
-    resolve: {
-        extensions: ['.tsx', '.ts', '.js'],
     },
     plugins: [
         new HtmlWebpackPlugin({
