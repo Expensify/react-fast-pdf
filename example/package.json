@@ -11,7 +11,7 @@
         "start": "webpack-dev-server --mode=development --open --hot",
         "build": "webpack --mode=production",
         "lint": "eslint src --fix",
-        "ts": "npx tsc --noEmit",
+        "ts": "tsc --noEmit",
         "prettier": "prettier --write .",
         "prettier-watch": "onchange \"**/*.js\" -- prettier --write --ignore-unknown {{changed}}",
         "test": "echo \"Error: no test specified\" && exit 1"

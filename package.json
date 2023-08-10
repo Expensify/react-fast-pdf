@@ -8,9 +8,9 @@
     "src"
   ],
   "scripts": {
-    "build": "npx tsc",
+    "build": "tsc",
     "lint": "eslint src --fix",
-    "ts": "npx tsc --noEmit",
+    "ts": "tsc --noEmit",
     "prettier": "prettier --write .",
     "prettier-watch": "onchange \"**/*.js\" -- prettier --write --ignore-unknown {{changed}}",
     "test": "echo \"Error: no test specified\" && exit 1"
