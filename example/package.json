@@ -1,6 +1,6 @@
 {
     "name": "react-fast-pdf-example",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "description": "react-fast-pdf",
     "main": "./src/index.js",
     "files": [
