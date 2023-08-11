@@ -1,7 +1,7 @@
 const styles = {
     container: {
         width: '100%',
-        height: '100%',
+        height: '100vh',
         display: 'grid',
         alignItems: 'center',
         justifyContent: 'center',
