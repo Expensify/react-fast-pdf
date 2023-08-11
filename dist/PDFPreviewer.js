@@ -119,7 +119,7 @@ function PDFPreviewer({ pageMaxWidth, isSmallScreen, file }) {
             window.removeEventListener('resize', setContainerDimensions);
         };
     }, [containerRef, setContainerDimensions]);
-    return (React.createElement("div", { ref: containerRef },
+    return (React.createElement("div", { ref: containerRef, style: styles.container },
         React.createElement(Document, { file: file, options: DEFAULT_DOCUMENT_OPTIONS, externalLinkTarget: DEFAULT_EXTERNAL_LINK_TARGET, error: React.createElement("p", null, "Failed to load the PDF file :("), loading: React.createElement("p", null, "Loading..."), onLoadSuccess: onDocumentLoadSuccess, onPassword: () => { } }, pageViewports.length > 0 && (React.createElement(List, { style: styles.list, outerRef: setListAttributes, width: isSmallScreen ? calculatePageWidth() : containerWidth, height: containerHeight, itemCount: numPages, itemSize: calculatePageHeight, estimatedItemSize: calculatePageHeight(0) }, renderPage)))));
 }
 PDFPreviewer.propTypes = propTypes;
