@@ -9,8 +9,7 @@ import pdfWorkerSource from 'pdfjs-dist/legacy/build/pdf.worker';
 import {VariableSizeList as List} from 'react-window';
 
 import styles from './styles';
-import {PDFDocument, PageViewport} from './types';
-// import type {PDFDocument, PageViewport} from './types';
+import type {PDFDocument, PageViewport} from './types';
 
 type Props = {
     file: string;
