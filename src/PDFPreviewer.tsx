@@ -65,15 +65,9 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.j
 function PDFPreviewer({pageMaxWidth, isSmallScreen, file}: Props) {
     const [pageViewports, setPageViewports] = useState<PageViewport[]>([]);
     const [numPages, setNumPages] = useState(0);
-    const [containerWidth, setContainerWidth] = useState(0);
-    const [containerHeight, setContainerHeight] = useState(0);
+    const [containerWidth, setContainerWidth] = useState(1000);
+    const [containerHeight, setContainerHeight] = useState(1000);
     const containerRef = useRef<HTMLDivElement>(null);
-
-    // TODO: Comment
-    const setContainerDimensions = useCallback(() => {
-        setContainerWidth(containerRef.current?.offsetWidth ?? 0);
-        setContainerHeight(containerRef.current?.offsetHeight ?? 0);
-    }, [containerRef]);
 
     /**
      * Calculates a proper page width.
@@ -157,14 +151,17 @@ function PDFPreviewer({pageMaxWidth, isSmallScreen, file}: Props) {
     );
 
     useEffect(() => {
-        window.addEventListener('load', setContainerDimensions);
-        window.addEventListener('resize', setContainerDimensions);
+        console.log('containerRef.current?.clientHeight', containerRef.current?.clientHeight);
+        console.log('containerRef.current?.clientWidth', containerRef.current?.clientWidth);
 
-        return () => {
-            window.removeEventListener('load', setContainerDimensions);
-            window.removeEventListener('resize', setContainerDimensions);
-        };
-    }, [containerRef, setContainerDimensions]);
+        if (containerRef.current?.clientHeight) {
+            setContainerHeight(containerRef.current?.clientHeight);
+        }
+
+        if (containerRef.current?.clientWidth) {
+            setContainerWidth(containerRef.current?.clientWidth);
+        }
+    }, [containerRef.current?.clientHeight, containerRef.current?.clientWidth]);
 
     return (
         <div
