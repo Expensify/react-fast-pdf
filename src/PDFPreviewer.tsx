@@ -13,6 +13,7 @@ type Props = {
     file: string;
     pageMaxWidth: number;
     isSmallScreen: boolean;
+    containerStyle: React.CSSProperties;
 };
 
 type ListRef = {
@@ -58,16 +59,29 @@ const propTypes = {
     file: PropTypes.string.isRequired,
     pageMaxWidth: PropTypes.number.isRequired,
     isSmallScreen: PropTypes.bool.isRequired,
+    // eslint-disable-next-line react/forbid-prop-types
+    containerStyle: PropTypes.object.isRequired,
 };
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString();
 
-function PDFPreviewer({pageMaxWidth, isSmallScreen, file}: Props) {
+function PDFPreviewer({pageMaxWidth, isSmallScreen, file, containerStyle}: Props) {
     const [pageViewports, setPageViewports] = useState<PageViewport[]>([]);
     const [numPages, setNumPages] = useState(0);
     const [containerWidth, setContainerWidth] = useState(1000);
     const [containerHeight, setContainerHeight] = useState(1000);
     const containerRef = useRef<HTMLDivElement>(null);
+
+    // TODO: Comment
+    const setContainerDimensions = useCallback(() => {
+        // eslint-disable-next-line no-console
+        console.log('containerRef.current?.clientHeight', containerRef.current?.clientHeight);
+        // eslint-disable-next-line no-console
+        console.log('containerRef.current?.clientWidth', containerRef.current?.clientWidth);
+
+        setContainerWidth(containerRef.current?.clientHeight ?? 0);
+        setContainerHeight(containerRef.current?.clientWidth ?? 0);
+    }, [containerRef.current]);
 
     /**
      * Calculates a proper page width.
@@ -151,22 +165,19 @@ function PDFPreviewer({pageMaxWidth, isSmallScreen, file}: Props) {
     );
 
     useEffect(() => {
-        console.log('containerRef.current?.clientHeight', containerRef.current?.clientHeight);
-        console.log('containerRef.current?.clientWidth', containerRef.current?.clientWidth);
+        window.addEventListener('load', setContainerDimensions);
+        window.addEventListener('resize', setContainerDimensions);
 
-        if (containerRef.current?.clientHeight) {
-            setContainerHeight(containerRef.current?.clientHeight);
-        }
-
-        if (containerRef.current?.clientWidth) {
-            setContainerWidth(containerRef.current?.clientWidth);
-        }
-    }, [containerRef.current?.clientHeight, containerRef.current?.clientWidth]);
+        return () => {
+            window.removeEventListener('load', setContainerDimensions);
+            window.removeEventListener('resize', setContainerDimensions);
+        };
+    }, [setContainerDimensions]);
 
     return (
         <div
             ref={containerRef}
-            style={styles.container}
+            style={Object.assign(styles.container, containerStyle)}
         >
             <Document
                 file={file}
