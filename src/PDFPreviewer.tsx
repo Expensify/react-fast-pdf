@@ -1,8 +1,10 @@
 import _ from 'underscore';
 import React, {memo, useCallback, useEffect, useRef, useState} from 'react';
 import PropTypes from 'prop-types';
-import {Document, Page, pdfjs} from 'react-pdf';
 import {VariableSizeList as List} from 'react-window';
+import {Document, Page, pdfjs} from 'react-pdf';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
 
 import styles from './styles';
 import type {PDFDocument, PageViewport} from './types';
