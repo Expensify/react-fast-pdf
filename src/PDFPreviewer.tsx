@@ -14,7 +14,7 @@ import type {PDFDocument, PageViewport} from './types';
 type Props = {
     file: string;
     pageMaxWidth: number;
-    isSmallScreen: number;
+    isSmallScreen: boolean;
 };
 
 type ListRef = {
