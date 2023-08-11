@@ -2,10 +2,6 @@ declare const styles: {
     container: {
         width: string;
         height: string;
-        display: string;
-        alignItems: string;
-        justifyContent: string;
-        overflow: string;
     };
     list: {
         readonly overflowX: "hidden";
