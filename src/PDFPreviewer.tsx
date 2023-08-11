@@ -167,7 +167,10 @@ function PDFPreviewer({pageMaxWidth, isSmallScreen, file}: Props) {
     }, [containerRef, setContainerDimensions]);
 
     return (
-        <div ref={containerRef}>
+        <div
+            ref={containerRef}
+            style={styles.container}
+        >
             <Document
                 file={file}
                 options={DEFAULT_DOCUMENT_OPTIONS}
