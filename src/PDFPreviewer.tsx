@@ -1,11 +1,7 @@
 import _ from 'underscore';
 import React, {memo, useCallback, useEffect, useRef, useState} from 'react';
 import PropTypes from 'prop-types';
-// @ts-expect-error TODO: Comment
-import {Document, Page, pdfjs} from 'react-pdf/dist/esm/entry.webpack';
-// @ts-expect-error TODO: Comment
-// eslint-disable-next-line import/no-extraneous-dependencies
-import pdfWorkerSource from 'pdfjs-dist/legacy/build/pdf.worker';
+import {Document, Page, pdfjs} from 'react-pdf';
 import {VariableSizeList as List} from 'react-window';
 
 import styles from './styles';
@@ -62,9 +58,7 @@ const propTypes = {
     isSmallScreen: PropTypes.bool.isRequired,
 };
 
-const workerBlob = new Blob([pdfWorkerSource], {type: 'text/javascript'});
-// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-pdfjs.GlobalWorkerOptions.workerSrc = URL.createObjectURL(workerBlob);
+pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString();
 
 function PDFPreviewer({pageMaxWidth, isSmallScreen, file}: Props) {
     const [pageViewports, setPageViewports] = useState<PageViewport[]>([]);
