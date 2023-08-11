@@ -28,9 +28,15 @@
     "url": "https://github.com/Expensify/react-fast-pdf/issues"
   },
   "homepage": "https://github.com/Expensify/react-fast-pdf#readme",
+  "dependencies": {
+    "react-pdf": "^7.3.3",
+    "react-window": "^1.8.9"
+  },
   "peerDependencies": {
+    "prop-types": "^15.8.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "underscore": "^1.13.6"
   },
   "devDependencies": {
     "@babel/cli": "^7.22.9",
@@ -40,6 +46,9 @@
     "@babel/preset-typescript": "^7.22.5",
     "@types/react": "^18.2.17",
     "@types/react-dom": "^18.2.7",
+    "@types/react-pdf": "^7.0.0",
+    "@types/react-window": "^1.8.5",
+    "@types/underscore": "^1.11.6",
     "@typescript-eslint/eslint-plugin": "^6.2.0",
     "@typescript-eslint/parser": "^6.2.0",
     "babel-loader": "^9.1.3",
