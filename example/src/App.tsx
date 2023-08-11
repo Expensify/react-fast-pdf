@@ -5,13 +5,19 @@ import ReactFastPDF, {PDFPreviewer} from 'react-fast-pdf';
 
 function App() {
     return (
-        <main>
+        <main
+            style={{
+                height: '100%',
+                width: '100%',
+            }}
+        >
             <h1>Hello, I am {ReactFastPDF.PackageName}!</h1>
 
             <PDFPreviewer
                 file="/example.pdf"
-                pageMaxWidth={1000}
+                pageMaxWidth={800}
                 isSmallScreen={false}
+                containerStyle={{}}
             />
         </main>
     );
