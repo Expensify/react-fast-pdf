@@ -1,41 +1,9 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const underscore_1 = __importDefault(require("underscore"));
-const react_1 = __importStar(require("react"));
-const prop_types_1 = __importDefault(require("prop-types"));
-// @ts-expect-error TODO: Comment
-const entry_webpack_1 = require("react-pdf/dist/esm/entry.webpack");
-// @ts-expect-error TODO: Comment
-// eslint-disable-next-line import/no-extraneous-dependencies
-const pdf_worker_1 = __importDefault(require("pdfjs-dist/legacy/build/pdf.worker"));
-const react_window_1 = require("react-window");
-const styles_1 = __importDefault(require("./styles"));
+import _ from 'underscore';
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
+import PropTypes from 'prop-types';
+import { Document, Page, pdfjs } from 'react-pdf';
+import { VariableSizeList as List } from 'react-window';
+import styles from './styles';
 /**
  * Each page has a default border. The app should take this size into account
  * when calculates the page width and height.
@@ -67,21 +35,19 @@ const setListAttributes = (ref) => {
     ref.tabIndex = -1;
 };
 const propTypes = {
-    file: prop_types_1.default.string.isRequired,
-    pageMaxWidth: prop_types_1.default.number.isRequired,
-    isSmallScreen: prop_types_1.default.bool.isRequired,
+    file: PropTypes.string.isRequired,
+    pageMaxWidth: PropTypes.number.isRequired,
+    isSmallScreen: PropTypes.bool.isRequired,
 };
-const workerBlob = new Blob([pdf_worker_1.default], { type: 'text/javascript' });
-// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-entry_webpack_1.pdfjs.GlobalWorkerOptions.workerSrc = URL.createObjectURL(workerBlob);
+pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString();
 function PDFPreviewer({ pageMaxWidth, isSmallScreen, file }) {
-    const [pageViewports, setPageViewports] = (0, react_1.useState)([]);
-    const [numPages, setNumPages] = (0, react_1.useState)(0);
-    const [containerWidth, setContainerWidth] = (0, react_1.useState)(0);
-    const [containerHeight, setContainerHeight] = (0, react_1.useState)(0);
-    const containerRef = (0, react_1.useRef)(null);
+    const [pageViewports, setPageViewports] = useState([]);
+    const [numPages, setNumPages] = useState(0);
+    const [containerWidth, setContainerWidth] = useState(0);
+    const [containerHeight, setContainerHeight] = useState(0);
+    const containerRef = useRef(null);
     // TODO: Comment
-    const setContainerDimensions = (0, react_1.useCallback)(() => {
+    const setContainerDimensions = useCallback(() => {
         var _a, _b, _c, _d;
         setContainerWidth((_b = (_a = containerRef.current) === null || _a === void 0 ? void 0 : _a.offsetWidth) !== null && _b !== void 0 ? _b : 0);
         setContainerHeight((_d = (_c = containerRef.current) === null || _c === void 0 ? void 0 : _c.offsetHeight) !== null && _d !== void 0 ? _d : 0);
@@ -90,7 +56,7 @@ function PDFPreviewer({ pageMaxWidth, isSmallScreen, file }) {
      * Calculates a proper page width.
      * It depends on a screen size. Also, the app should take into account the page borders.
      */
-    const calculatePageWidth = (0, react_1.useCallback)(() => {
+    const calculatePageWidth = useCallback(() => {
         const pageWidthOnLargeScreen = Math.min(containerWidth - LARGE_SCREEN_SIDE_SPACING * 2, pageMaxWidth);
         const pageWidth = isSmallScreen ? containerWidth : pageWidthOnLargeScreen;
         return pageWidth + PAGE_BORDER * 2;
@@ -100,7 +66,7 @@ function PDFPreviewer({ pageMaxWidth, isSmallScreen, file }) {
      * It is based on a ratio between the specific page viewport width and provided page width.
      * Also, the app should take into account the page borders.
      */
-    const calculatePageHeight = (0, react_1.useCallback)((pageIndex) => {
+    const calculatePageHeight = useCallback((pageIndex) => {
         if (pageViewports.length === 0) {
             // eslint-disable-next-line no-console
             console.warn('Dev error: calculatePageHeight() in PDFView called too early');
@@ -119,7 +85,7 @@ function PDFPreviewer({ pageMaxWidth, isSmallScreen, file }) {
      */
     const onDocumentLoadSuccess = (pdf) => {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        Promise.all(underscore_1.default.times(pdf.numPages, (index) => {
+        Promise.all(_.times(pdf.numPages, (index) => {
             const pageNumber = index + 1;
             return pdf.getPage(pageNumber).then((page) => page.getViewport({ scale: 1 }));
         })).then((viewports) => {
@@ -133,17 +99,17 @@ function PDFPreviewer({ pageMaxWidth, isSmallScreen, file }) {
      * Render a specific page based on its index.
      * The method includes a wrapper to apply virtualized styles.
      */
-    const renderPage = (0, react_1.useCallback)(
+    const renderPage = useCallback(
     // eslint-disable-next-line react/no-unused-prop-types
     ({ index, style }) => {
         const pageWidth = calculatePageWidth();
-        return (react_1.default.createElement("div", { style: style },
-            react_1.default.createElement(entry_webpack_1.Page, { key: `page_${index}`, width: pageWidth, pageIndex: index, 
+        return (React.createElement("div", { style: style },
+            React.createElement(Page, { key: `page_${index}`, width: pageWidth, pageIndex: index, 
                 // This needs to be empty to avoid multiple loading texts which show per page and look ugly
                 // See https://github.com/Expensify/App/issues/14358 for more details
                 loading: "" })));
     }, [calculatePageWidth]);
-    (0, react_1.useEffect)(() => {
+    useEffect(() => {
         window.addEventListener('load', setContainerDimensions);
         window.addEventListener('resize', setContainerDimensions);
         return () => {
@@ -151,8 +117,8 @@ function PDFPreviewer({ pageMaxWidth, isSmallScreen, file }) {
             window.removeEventListener('resize', setContainerDimensions);
         };
     }, [containerRef, setContainerDimensions]);
-    return (react_1.default.createElement("div", { ref: containerRef },
-        react_1.default.createElement(entry_webpack_1.Document, { file: file, options: DEFAULT_DOCUMENT_OPTIONS, externalLinkTarget: DEFAULT_EXTERNAL_LINK_TARGET, error: react_1.default.createElement("p", null, "Failed to load the PDF file :("), loading: react_1.default.createElement("p", null, "Loading..."), onLoadSuccess: onDocumentLoadSuccess, onPassword: () => { } }, pageViewports.length > 0 && (react_1.default.createElement(react_window_1.VariableSizeList, { style: styles_1.default.list, outerRef: setListAttributes, width: isSmallScreen ? calculatePageWidth() : containerWidth, height: containerHeight, itemCount: numPages, itemSize: calculatePageHeight, estimatedItemSize: calculatePageHeight(0) }, renderPage)))));
+    return (React.createElement("div", { ref: containerRef },
+        React.createElement(Document, { file: file, options: DEFAULT_DOCUMENT_OPTIONS, externalLinkTarget: DEFAULT_EXTERNAL_LINK_TARGET, error: React.createElement("p", null, "Failed to load the PDF file :("), loading: React.createElement("p", null, "Loading..."), onLoadSuccess: onDocumentLoadSuccess, onPassword: () => { } }, pageViewports.length > 0 && (React.createElement(List, { style: styles.list, outerRef: setListAttributes, width: isSmallScreen ? calculatePageWidth() : containerWidth, height: containerHeight, itemCount: numPages, itemSize: calculatePageHeight, estimatedItemSize: calculatePageHeight(0) }, renderPage)))));
 }
 PDFPreviewer.propTypes = propTypes;
-exports.default = (0, react_1.memo)(PDFPreviewer);
+export default memo(PDFPreviewer);

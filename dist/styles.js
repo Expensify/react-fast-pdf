@@ -1,5 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 const styles = {
     list: {
         overflowX: 'hidden',
@@ -8,4 +6,4 @@ const styles = {
         outline: 'none',
     },
 };
-exports.default = styles;
+export default styles;
