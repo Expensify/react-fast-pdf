@@ -3,6 +3,7 @@ name: Style and Syntax Checks
 on:
     pull_request:
         types: [opened, synchronize]
+    push:
 
 jobs:
     checks:
