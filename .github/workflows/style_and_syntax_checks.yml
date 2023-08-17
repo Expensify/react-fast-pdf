@@ -1,0 +1,30 @@
+name: Style and Syntax Checks
+
+on:
+    pull_request:
+        types: [opened, synchronize]
+
+jobs:
+    checks:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Setup Node
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+                  cache: npm
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Run ESLint
+              run: npx eslint src
+
+            - name: Run Prettier
+              run: npx prettier . --check
+
+            - name: Run TypeScript checks
+              run: npm run ts
