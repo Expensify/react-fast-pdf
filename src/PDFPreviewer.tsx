@@ -1,4 +1,5 @@
 import React, {memo, useCallback, useLayoutEffect, useRef, useState} from 'react';
+import type {CSSProperties} from 'react';
 import times from 'lodash/times';
 import PropTypes from 'prop-types';
 import {VariableSizeList as List} from 'react-window';
@@ -13,7 +14,8 @@ type Props = {
     file: string;
     pageMaxWidth: number;
     isSmallScreen: boolean;
-    containerStyle?: React.CSSProperties;
+    containerStyle?: CSSProperties;
+    contentContainerStyle?: CSSProperties;
 };
 
 type ListRef = {
@@ -63,15 +65,18 @@ const propTypes = {
     isSmallScreen: PropTypes.bool.isRequired,
     // eslint-disable-next-line react/forbid-prop-types
     containerStyle: PropTypes.object,
+    // eslint-disable-next-line react/forbid-prop-types
+    contentContainerStyle: PropTypes.object,
 };
 
 const defaultProps = {
     containerStyle: {},
+    contentContainerStyle: {},
 };
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString();
 
-function PDFPreviewer({pageMaxWidth, isSmallScreen, file, containerStyle}: Props) {
+function PDFPreviewer({pageMaxWidth, isSmallScreen, file, containerStyle, contentContainerStyle}: Props) {
     const [pageViewports, setPageViewports] = useState<PageViewport[]>([]);
     const [numPages, setNumPages] = useState(0);
     const [containerWidth, setContainerWidth] = useState(0);
@@ -182,7 +187,7 @@ function PDFPreviewer({pageMaxWidth, isSmallScreen, file, containerStyle}: Props
             >
                 {pageViewports.length > 0 && (
                     <List
-                        style={styles.list}
+                        style={{...styles.list, ...contentContainerStyle}}
                         outerRef={setListAttributes}
                         width={containerWidth}
                         height={containerHeight}

@@ -2,6 +2,11 @@ declare const styles: {
     container: {
         width: string;
         height: string;
+        /**
+         * It's being used on Web/Desktop only to vertically center short PDFs,
+         * while preventing the overflow of the top of long PDF files.
+         */
+        display: string;
     };
     list: {
         readonly overflowX: "hidden";

@@ -44,12 +44,15 @@ const propTypes = {
     isSmallScreen: PropTypes.bool.isRequired,
     // eslint-disable-next-line react/forbid-prop-types
     containerStyle: PropTypes.object,
+    // eslint-disable-next-line react/forbid-prop-types
+    contentContainerStyle: PropTypes.object,
 };
 const defaultProps = {
     containerStyle: {},
+    contentContainerStyle: {},
 };
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString();
-function PDFPreviewer({ pageMaxWidth, isSmallScreen, file, containerStyle }) {
+function PDFPreviewer({ pageMaxWidth, isSmallScreen, file, containerStyle, contentContainerStyle }) {
     const [pageViewports, setPageViewports] = useState([]);
     const [numPages, setNumPages] = useState(0);
     const [containerWidth, setContainerWidth] = useState(0);
@@ -118,7 +121,7 @@ function PDFPreviewer({ pageMaxWidth, isSmallScreen, file, containerStyle }) {
     return (React.createElement("div", { ref: containerRef, style: Object.assign(Object.assign({}, styles.container), containerStyle) },
         React.createElement(Document, { file: file, options: DEFAULT_DOCUMENT_OPTIONS, externalLinkTarget: DEFAULT_EXTERNAL_LINK_TARGET, error: React.createElement("p", null, "Failed to load the PDF file :("), loading: React.createElement("p", null, "Loading..."), onLoadSuccess: onDocumentLoadSuccess, 
             // TODO: Implement behaviour
-            onPassword: () => { } }, pageViewports.length > 0 && (React.createElement(List, { style: styles.list, outerRef: setListAttributes, width: containerWidth, height: containerHeight, itemCount: numPages, itemSize: calculatePageHeight, estimatedItemSize: calculatePageHeight(0) }, renderPage)))));
+            onPassword: () => { } }, pageViewports.length > 0 && (React.createElement(List, { style: Object.assign(Object.assign({}, styles.list), contentContainerStyle), outerRef: setListAttributes, width: containerWidth, height: containerHeight, itemCount: numPages, itemSize: calculatePageHeight, estimatedItemSize: calculatePageHeight(0) }, renderPage)))));
 }
 PDFPreviewer.propTypes = propTypes;
 PDFPreviewer.defaultProps = defaultProps;
