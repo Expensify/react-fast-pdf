@@ -2,22 +2,17 @@ import React from 'react';
 // TODO: Change the package source in package.json
 // TODO: Use built source code, not initial
 import ReactFastPDF, {PDFPreviewer} from 'react-fast-pdf';
+import './index.css';
 
 function App() {
     return (
-        <main
-            style={{
-                height: '100%',
-                width: '100%',
-            }}
-        >
-            <h1>Hello, I am {ReactFastPDF.PackageName}!</h1>
+        <main className="container">
+            <h1 className="title">Hello, I am {ReactFastPDF.PackageName}!</h1>
 
             <PDFPreviewer
                 file="/example.pdf"
-                pageMaxWidth={800}
+                pageMaxWidth={1000}
                 isSmallScreen={false}
-                containerStyle={{}}
             />
         </main>
     );
