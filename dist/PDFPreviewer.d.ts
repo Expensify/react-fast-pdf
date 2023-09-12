@@ -6,7 +6,7 @@ type Props = {
     file: string;
     pageMaxWidth: number;
     isSmallScreen: boolean;
-    containerStyle: React.CSSProperties;
+    containerStyle?: React.CSSProperties;
 };
 declare function PDFPreviewer({ pageMaxWidth, isSmallScreen, file, containerStyle }: Props): React.JSX.Element;
 declare namespace PDFPreviewer {
@@ -14,7 +14,10 @@ declare namespace PDFPreviewer {
         file: PropTypes.Validator<string>;
         pageMaxWidth: PropTypes.Validator<number>;
         isSmallScreen: PropTypes.Validator<boolean>;
-        containerStyle: PropTypes.Validator<object>;
+        containerStyle: PropTypes.Requireable<object>;
+    };
+    var defaultProps: {
+        containerStyle: {};
     };
 }
 declare const _default: React.MemoExoticComponent<typeof PDFPreviewer>;
