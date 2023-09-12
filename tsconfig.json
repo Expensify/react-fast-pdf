@@ -16,11 +16,6 @@
         "skipLibCheck": true /* Skip type checking all .d.ts files. */,
         "moduleResolution": "nodenext"
     },
-    "include": [
-        "./src"
-    ],
-    "exclude": [
-        "./node_modules",
-        "./dist"
-    ]
+    "include": ["./src"],
+    "exclude": ["./node_modules", "./dist"]
 }
