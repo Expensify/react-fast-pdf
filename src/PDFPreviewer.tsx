@@ -1,5 +1,5 @@
-import _ from 'underscore';
-import React, {memo, useCallback, useEffect, useRef, useState} from 'react';
+import React, {memo, useCallback, useLayoutEffect, useRef, useState} from 'react';
+import times from 'lodash/times';
 import PropTypes from 'prop-types';
 import {VariableSizeList as List} from 'react-window';
 import {Document, Page, pdfjs} from 'react-pdf';
@@ -13,7 +13,7 @@ type Props = {
     file: string;
     pageMaxWidth: number;
     isSmallScreen: boolean;
-    containerStyle: React.CSSProperties;
+    containerStyle?: React.CSSProperties;
 };
 
 type ListRef = {
@@ -49,8 +49,10 @@ const setListAttributes = (ref: ListRef | undefined) => {
         return;
     }
 
-    // Useful for elements that should not be navigated to directly using the "Tab" key,
-    // but need to have keyboard focus set to them.
+    /**
+     *  Useful for elements that should not be navigated to directly using the "Tab" key,
+     * but need to have keyboard focus set to them.
+     */
     // eslint-disable-next-line no-param-reassign
     ref.tabIndex = -1;
 };
@@ -60,7 +62,11 @@ const propTypes = {
     pageMaxWidth: PropTypes.number.isRequired,
     isSmallScreen: PropTypes.bool.isRequired,
     // eslint-disable-next-line react/forbid-prop-types
-    containerStyle: PropTypes.object.isRequired,
+    containerStyle: PropTypes.object,
+};
+
+const defaultProps = {
+    containerStyle: {},
 };
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString();
@@ -68,20 +74,9 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.j
 function PDFPreviewer({pageMaxWidth, isSmallScreen, file, containerStyle}: Props) {
     const [pageViewports, setPageViewports] = useState<PageViewport[]>([]);
     const [numPages, setNumPages] = useState(0);
-    const [containerWidth, setContainerWidth] = useState(1000);
-    const [containerHeight, setContainerHeight] = useState(1000);
+    const [containerWidth, setContainerWidth] = useState(0);
+    const [containerHeight, setContainerHeight] = useState(0);
     const containerRef = useRef<HTMLDivElement>(null);
-
-    // TODO: Comment
-    const setContainerDimensions = useCallback(() => {
-        // eslint-disable-next-line no-console
-        console.log('containerRef.current?.clientHeight', containerRef.current?.clientHeight);
-        // eslint-disable-next-line no-console
-        console.log('containerRef.current?.clientWidth', containerRef.current?.clientWidth);
-
-        setContainerWidth(containerRef.current?.clientHeight ?? 0);
-        setContainerHeight(containerRef.current?.clientWidth ?? 0);
-    }, [containerRef.current]);
 
     /**
      * Calculates a proper page width.
@@ -102,13 +97,11 @@ function PDFPreviewer({pageMaxWidth, isSmallScreen, file, containerStyle}: Props
     const calculatePageHeight = useCallback(
         (pageIndex: number) => {
             if (pageViewports.length === 0) {
-                // eslint-disable-next-line no-console
-                console.warn('Dev error: calculatePageHeight() in PDFView called too early');
-
                 return 0;
             }
 
             const pageWidth = calculatePageWidth();
+
             const {width: pageViewportWidth, height: pageViewportHeight} = pageViewports[pageIndex];
             const scale = pageWidth / pageViewportWidth;
 
@@ -124,19 +117,22 @@ function PDFPreviewer({pageMaxWidth, isSmallScreen, file, containerStyle}: Props
      * user input is no longer required.
      */
     const onDocumentLoadSuccess = (pdf: PDFDocument) => {
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         Promise.all(
-            _.times(pdf.numPages, (index: number) => {
+            times(pdf.numPages, (index: number) => {
                 const pageNumber = index + 1;
 
                 return pdf.getPage(pageNumber).then((page) => page.getViewport({scale: 1}));
             }),
-        ).then((viewports: PageViewport[]) => {
-            setPageViewports(viewports);
-            setNumPages(pdf.numPages);
-            // shouldRequestPassword: false,
-            // isPasswordInvalid: false,
-        });
+        ).then(
+            (viewports: PageViewport[]) => {
+                setPageViewports(viewports);
+                setNumPages(pdf.numPages);
+                // TODO: Implement behaviour
+                // shouldRequestPassword: false,
+                // isPasswordInvalid: false,
+            },
+            () => {},
+        );
     };
 
     /**
@@ -164,20 +160,15 @@ function PDFPreviewer({pageMaxWidth, isSmallScreen, file, containerStyle}: Props
         [calculatePageWidth],
     );
 
-    useEffect(() => {
-        window.addEventListener('load', setContainerDimensions);
-        window.addEventListener('resize', setContainerDimensions);
-
-        return () => {
-            window.removeEventListener('load', setContainerDimensions);
-            window.removeEventListener('resize', setContainerDimensions);
-        };
-    }, [setContainerDimensions]);
+    useLayoutEffect(() => {
+        setContainerWidth(containerRef.current?.clientWidth ?? 0);
+        setContainerHeight(containerRef.current?.clientHeight ?? 0);
+    }, []);
 
     return (
         <div
             ref={containerRef}
-            style={Object.assign(styles.container, containerStyle)}
+            style={{...styles.container, ...containerStyle}}
         >
             <Document
                 file={file}
@@ -186,13 +177,14 @@ function PDFPreviewer({pageMaxWidth, isSmallScreen, file, containerStyle}: Props
                 error={<p>Failed to load the PDF file :(</p>}
                 loading={<p>Loading...</p>}
                 onLoadSuccess={onDocumentLoadSuccess}
+                // TODO: Implement behaviour
                 onPassword={() => {}}
             >
                 {pageViewports.length > 0 && (
                     <List
                         style={styles.list}
                         outerRef={setListAttributes}
-                        width={isSmallScreen ? calculatePageWidth() : containerWidth}
+                        width={containerWidth}
                         height={containerHeight}
                         itemCount={numPages}
                         itemSize={calculatePageHeight}
@@ -207,5 +199,6 @@ function PDFPreviewer({pageMaxWidth, isSmallScreen, file, containerStyle}: Props
 }
 
 PDFPreviewer.propTypes = propTypes;
+PDFPreviewer.defaultProps = defaultProps;
 
 export default memo(PDFPreviewer);
