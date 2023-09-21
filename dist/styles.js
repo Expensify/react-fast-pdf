@@ -1,3 +1,5 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const styles = {
     container: {
         width: '100%',
@@ -15,4 +17,4 @@ const styles = {
         outline: 'none',
     },
 };
-export default styles;
+exports.default = styles;
