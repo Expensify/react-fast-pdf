@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+
+const cMapsDir = path.join(path.dirname(require.resolve('pdfjs-dist/package.json')), 'cmaps');
 
 module.exports = {
     entry: path.join(__dirname, 'src', 'index.js'),
@@ -44,6 +47,14 @@ module.exports = {
     plugins: [
         new HtmlWebpackPlugin({
             template: path.join(__dirname, 'public', 'index.html'),
+        }),
+        new CopyWebpackPlugin({
+            patterns: [
+                {
+                    from: cMapsDir,
+                    to: 'cmaps/',
+                },
+            ],
         }),
     ],
 };

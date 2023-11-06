@@ -32,7 +32,7 @@
     "dependencies": {
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
-        "react-fast-pdf": "git+https://github.com/rezkiy37/react-fast-pdf.git#feature/22998-pdf-preview-library"
+        "react-fast-pdf": "git+https://github.com/rezkiy37/react-fast-pdf.git#feature/22998-pdf-preview-component"
     },
     "devDependencies": {
         "@babel/cli": "^7.22.9",
@@ -45,6 +45,7 @@
         "@typescript-eslint/eslint-plugin": "^6.2.0",
         "@typescript-eslint/parser": "^6.2.0",
         "babel-loader": "^9.1.3",
+        "copy-webpack-plugin": "^11.0.0",
         "css-loader": "^6.8.1",
         "eslint": "^8.46.0",
         "eslint-config-airbnb": "^19.0.4",
