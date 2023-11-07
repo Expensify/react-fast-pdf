@@ -4,8 +4,7 @@
 # node.js
 node_modules/
 npm-debug.log
-# It is a temporary solution until we push the package to NPM
-# dist/
+dist/
 
 # NPM file created by GitHub actions
 .npmrc
