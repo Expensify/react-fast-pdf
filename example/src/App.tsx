@@ -1,6 +1,4 @@
 import React, {CSSProperties} from 'react';
-// TODO: Change the package source in package.json
-// TODO: Use built source code, not initial
 import ReactFastPDF, {PDFPreviewer} from 'react-fast-pdf';
 import './index.css';
 
