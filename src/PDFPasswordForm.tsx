@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect, ChangeEvent, FormEventHandler, useMemo} from 'react';
+import React, {useState, useRef, useMemo, type ChangeEvent, type FormEventHandler} from 'react';
 import PropTypes from 'prop-types';
 
 import {pdfPasswordFormStyles as styles} from './styles';
@@ -93,14 +93,6 @@ function PDFPasswordForm({isPasswordInvalid, isFocused, onSubmit, onPasswordUpda
         onPasswordFieldFocused?.(false);
     };
 
-    useEffect(() => {
-        if (!isFocused) {
-            return;
-        }
-
-        textInputRef.current?.focus();
-    }, [isFocused]);
-
     if (!shouldShowForm) {
         return (
             <div style={styles.container}>
@@ -144,6 +136,8 @@ function PDFPasswordForm({isPasswordInvalid, isFocused, onSubmit, onPasswordUpda
                          * This tricks the browser not to fill the username somewhere else and still fill the password correctly.
                          */
                         autoComplete={isSafari ? 'username' : 'off'}
+                        // eslint-disable-next-line jsx-a11y/no-autofocus
+                        autoFocus={isFocused}
                         type="password"
                         onFocus={() => onPasswordFieldFocused(true)}
                         onBlur={validateAndNotifyPasswordBlur}
