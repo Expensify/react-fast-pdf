@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect, ChangeEvent} from 'react';
+import React, {useState, useRef, useEffect, ChangeEvent, FormEventHandler, useMemo} from 'react';
 import PropTypes from 'prop-types';
 
 import {pdfPasswordFormStyles as styles} from './styles';
@@ -42,28 +42,44 @@ function PDFPasswordForm({isPasswordInvalid, isFocused, onSubmit, onPasswordUpda
     const [password, setPassword] = useState('');
     const [validationErrorText, setValidationErrorText] = useState('');
     const [shouldShowForm, setShouldShowForm] = useState(false);
+
     const textInputRef = useRef<HTMLInputElement>(null);
+
+    const errorText = useMemo(() => {
+        if (isPasswordInvalid) {
+            return 'Incorrect password. Please try again.';
+        }
+
+        if (validationErrorText) {
+            return validationErrorText;
+        }
+
+        return '';
+    }, [isPasswordInvalid, validationErrorText]);
 
     const updatePassword = (event: ChangeEvent<HTMLInputElement>) => {
         const newPassword = event.target.value;
 
         setPassword(newPassword);
         onPasswordUpdated(newPassword);
+        setValidationErrorText('');
     };
 
     const validate = () => {
-        if (!isPasswordInvalid && !password) {
+        if (!isPasswordInvalid && password) {
             return true;
         }
 
         if (!password) {
-            setValidationErrorText('Password required');
+            setValidationErrorText('Password required. Pleaser enter.');
         }
 
         return false;
     };
 
-    const submitPassword = () => {
+    const submitPassword: FormEventHandler<HTMLFormElement> = (e) => {
+        e.preventDefault();
+
         if (!validate()) {
             return;
         }
@@ -132,11 +148,10 @@ function PDFPasswordForm({isPasswordInvalid, isFocused, onSubmit, onPasswordUpda
                         onFocus={() => onPasswordFieldFocused(true)}
                         onBlur={validateAndNotifyPasswordBlur}
                         onChange={updatePassword}
-                        onSubmit={submitPassword}
                     />
                 </label>
 
-                {!!validationErrorText && <p style={styles.errorMessage}>{validationErrorText}</p>}
+                {!!errorText && <p style={styles.errorMessage}>{errorText}</p>}
 
                 <input
                     style={styles.confirmButton}
