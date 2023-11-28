@@ -2,7 +2,7 @@ import React, {CSSProperties} from 'react';
 import ReactFastPDF, {PDFPreviewer} from 'react-fast-pdf';
 import './index.css';
 
-const pdfPreviewerContainerStyles: CSSProperties = {
+const pdfPreviewerContainerStyle: CSSProperties = {
     borderRadius: 4,
     borderWidth: 2,
     borderColor: '#184E3D',
@@ -18,7 +18,7 @@ function App() {
                 file="/example.pdf"
                 pageMaxWidth={1000}
                 isSmallScreen={false}
-                containerStyle={pdfPreviewerContainerStyles}
+                containerStyle={pdfPreviewerContainerStyle}
             />
         </main>
     );
