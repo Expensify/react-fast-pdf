@@ -9,21 +9,6 @@ const pdfPreviewerContainerStyle: CSSProperties = {
     borderStyle: 'solid',
 };
 
-const buttonsContainer: CSSProperties = {
-    marginTop: 16,
-    display: 'flex',
-};
-
-const fileButtonStyle: CSSProperties = {
-    margin: '0 8px',
-    padding: '8px 16px',
-    fontSize: 18,
-    border: 0,
-    borderRadius: 16,
-    backgroundColor: '#03d47c',
-    cursor: 'pointer',
-};
-
 function App() {
     const [file, setFile] = useState<string | null>(null);
 
@@ -32,19 +17,29 @@ function App() {
             <h1 className="title">Hello, I am {ReactFastPDF.PackageName}!</h1>
 
             {file ? (
-                <PDFPreviewer
-                    file={file}
-                    pageMaxWidth={1000}
-                    isSmallScreen={false}
-                    containerStyle={pdfPreviewerContainerStyle}
-                />
+                <>
+                    <button
+                        className="button button_back"
+                        type="button"
+                        onClick={() => setFile(null)}
+                    >
+                        Back
+                    </button>
+
+                    <PDFPreviewer
+                        file={file}
+                        pageMaxWidth={1000}
+                        isSmallScreen={false}
+                        containerStyle={pdfPreviewerContainerStyle}
+                    />
+                </>
             ) : (
                 <>
                     <h3>Please choose a file for previewing:</h3>
 
-                    <div style={buttonsContainer}>
+                    <div className="buttons_container">
                         <button
-                            style={fileButtonStyle}
+                            className="button"
                             type="button"
                             onClick={() => setFile('example.pdf')}
                         >
@@ -52,7 +47,7 @@ function App() {
                         </button>
 
                         <button
-                            style={fileButtonStyle}
+                            className="button"
                             type="button"
                             onClick={() => setFile('example_protected.pdf')}
                         >

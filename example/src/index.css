@@ -40,3 +40,25 @@ body {
 .react-pdf__Page {
     background-color: transparent !important;
 }
+
+.buttons_container {
+    margin-top: 16px;
+    display: flex;
+}
+
+.button {
+    margin: 0 8px;
+    padding: 8px 16px;
+    font-size: 18px;
+    border: 0;
+    border-radius: 16px;
+    background-color: #03d47c;
+    cursor: 'pointer';
+}
+
+.button_back {
+    position: absolute;
+    z-index: 1;
+    left: 16px;
+    top: 16px;
+}
