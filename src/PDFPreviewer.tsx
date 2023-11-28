@@ -7,8 +7,9 @@ import {Document, Page, pdfjs} from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
-import styles from './styles';
 import type {PDFDocument, PageViewport} from './types';
+import {pdfPreviewerStyles as styles} from './styles';
+import PDFPasswordForm from './PDFPasswordForm';
 
 type Props = {
     file: string;
@@ -21,6 +22,8 @@ type Props = {
 type ListRef = {
     tabIndex: number;
 };
+
+type OnPasswordCallback = (password: string | null) => void;
 
 /**
  * Each page has a default border. The app should take this size into account
@@ -41,6 +44,14 @@ const DEFAULT_DOCUMENT_OPTIONS = {
 
 // TODO: Comment
 const DEFAULT_EXTERNAL_LINK_TARGET = '_blank';
+
+/**
+ * Constants for password-related error responses received from react-pdf.
+ */
+const PDF_PASSWORD_FORM_RESPONSES = {
+    NEED_PASSWORD: 1,
+    INCORRECT_PASSWORD: 2,
+};
 
 /**
  * Sets attributes to list container.
@@ -81,7 +92,10 @@ function PDFPreviewer({pageMaxWidth, isSmallScreen, file, containerStyle, conten
     const [numPages, setNumPages] = useState(0);
     const [containerWidth, setContainerWidth] = useState(0);
     const [containerHeight, setContainerHeight] = useState(0);
+    const [shouldRequestPassword, setShouldRequestPassword] = useState(false);
+    const [isPasswordInvalid, setIsPasswordInvalid] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
+    const onPasswordCallbackRef = useRef<OnPasswordCallback>(null);
 
     /**
      * Calculates a proper page width.
@@ -132,12 +146,40 @@ function PDFPreviewer({pageMaxWidth, isSmallScreen, file, containerStyle, conten
             (viewports: PageViewport[]) => {
                 setPageViewports(viewports);
                 setNumPages(pdf.numPages);
-                // TODO: Implement behaviour
-                // shouldRequestPassword: false,
-                // isPasswordInvalid: false,
+                setShouldRequestPassword(false);
+                setIsPasswordInvalid(false);
             },
             () => {},
         );
+    };
+
+    /**
+     * Initiate password challenge process. The react-pdf/Document
+     * component calls this handler to indicate that a PDF requires a
+     * password, or to indicate that a previously provided password was
+     * invalid.
+     *
+     * The PasswordResponses constants used below were copied from react-pdf
+     * because they're not exported in entry.webpack.
+     */
+    const initiatePasswordChallenge = (callback: OnPasswordCallback, reason: number) => {
+        // @ts-expect-error - TODO: fix an error
+        onPasswordCallbackRef.current = callback;
+
+        if (reason === PDF_PASSWORD_FORM_RESPONSES.NEED_PASSWORD) {
+            setShouldRequestPassword(true);
+        } else if (reason === PDF_PASSWORD_FORM_RESPONSES.INCORRECT_PASSWORD) {
+            setShouldRequestPassword(true);
+            setIsPasswordInvalid(true);
+        }
+    };
+
+    /**
+     * Send password to react-pdf via its callback so that it can attempt to load
+     * the PDF.
+     */
+    const attemptPDFLoad = (password: string) => {
+        onPasswordCallbackRef.current?.(password);
     };
 
     /**
@@ -182,8 +224,7 @@ function PDFPreviewer({pageMaxWidth, isSmallScreen, file, containerStyle, conten
                 error={<p>Failed to load the PDF file :(</p>}
                 loading={<p>Loading...</p>}
                 onLoadSuccess={onDocumentLoadSuccess}
-                // TODO: Implement behaviour
-                onPassword={() => {}}
+                onPassword={initiatePasswordChallenge}
             >
                 {pageViewports.length > 0 && (
                     <List
@@ -199,6 +240,15 @@ function PDFPreviewer({pageMaxWidth, isSmallScreen, file, containerStyle, conten
                     </List>
                 )}
             </Document>
+
+            {shouldRequestPassword && (
+                <PDFPasswordForm
+                    isFocused
+                    isPasswordInvalid={isPasswordInvalid}
+                    onSubmit={attemptPDFLoad}
+                    onPasswordUpdated={() => setIsPasswordInvalid(false)}
+                />
+            )}
         </div>
     );
 }

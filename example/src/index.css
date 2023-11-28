@@ -7,10 +7,15 @@
         url('../assets/fonts/ExpensifyNeue-Bold.woff') format('woff');
 }
 
+* {
+    margin: 0;
+    color: #e7ece9;
+    font-family: ExpensifyMono-Neue;
+}
+
 body {
     width: 100vw;
     height: 100vh;
-    margin: 0;
     overflow: hidden;
 }
 
@@ -29,9 +34,7 @@ body {
 }
 
 .title {
-    margin: 0 0 16px;
-    font-family: ExpensifyMono-Neue;
-    color: #e7ece9;
+    margin-bottom: 16px;
 }
 
 .react-pdf__Page {
