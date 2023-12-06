@@ -7,8 +7,8 @@ type Props = {
     isPasswordInvalid: boolean;
     isFocused: boolean;
     onSubmit: (password: string) => void;
-    onPasswordUpdated: (password: string) => void;
-    onPasswordFieldFocused: (isFocused: boolean) => void;
+    onPasswordChange: (password: string) => void;
+    onPasswordFieldFocus: (isFocused: boolean) => void;
 };
 
 const propTypes = {
@@ -22,23 +22,23 @@ const propTypes = {
     onSubmit: PropTypes.func,
 
     /** Notify parent that the password has been updated/edited */
-    onPasswordUpdated: PropTypes.func,
+    onPasswordChange: PropTypes.func,
 
     /** Notify parent that a text field has been focused or blurred */
-    onPasswordFieldFocused: PropTypes.func,
+    onPasswordFieldFocus: PropTypes.func,
 };
 
 const defaultProps = {
     isPasswordInvalid: false,
     onSubmit: () => {},
-    onPasswordUpdated: () => {},
-    onPasswordFieldFocused: () => {},
+    onPasswordChange: () => {},
+    onPasswordFieldFocus: () => {},
 };
 
 // @ts-expect-error TODO: Comment
 const isSafari = Boolean(window.safari);
 
-function PDFPasswordForm({isPasswordInvalid, isFocused, onSubmit, onPasswordUpdated, onPasswordFieldFocused}: Props) {
+function PDFPasswordForm({isPasswordInvalid, isFocused, onSubmit, onPasswordChange, onPasswordFieldFocus}: Props) {
     const [password, setPassword] = useState('');
     const [validationErrorText, setValidationErrorText] = useState('');
     const [shouldShowForm, setShouldShowForm] = useState(false);
@@ -61,7 +61,7 @@ function PDFPasswordForm({isPasswordInvalid, isFocused, onSubmit, onPasswordUpda
         const newPassword = event.target.value;
 
         setPassword(newPassword);
-        onPasswordUpdated(newPassword);
+        onPasswordChange(newPassword);
         setValidationErrorText('');
     };
 
@@ -90,7 +90,7 @@ function PDFPasswordForm({isPasswordInvalid, isFocused, onSubmit, onPasswordUpda
     const validateAndNotifyPasswordBlur = () => {
         validate();
 
-        onPasswordFieldFocused?.(false);
+        onPasswordFieldFocus?.(false);
     };
 
     if (!shouldShowForm) {
@@ -139,7 +139,7 @@ function PDFPasswordForm({isPasswordInvalid, isFocused, onSubmit, onPasswordUpda
                         // eslint-disable-next-line jsx-a11y/no-autofocus
                         autoFocus={isFocused}
                         type="password"
-                        onFocus={() => onPasswordFieldFocused(true)}
+                        onFocus={() => onPasswordFieldFocus(true)}
                         onBlur={validateAndNotifyPasswordBlur}
                         onChange={updatePassword}
                     />

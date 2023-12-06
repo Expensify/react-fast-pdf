@@ -252,7 +252,7 @@ function PDFPreviewer({pageMaxWidth, isSmallScreen, file, containerStyle, conten
                     isFocused
                     isPasswordInvalid={isPasswordInvalid}
                     onSubmit={attemptPDFLoad}
-                    onPasswordUpdated={() => setIsPasswordInvalid(false)}
+                    onPasswordChange={() => setIsPasswordInvalid(false)}
                 />
             )}
         </div>
