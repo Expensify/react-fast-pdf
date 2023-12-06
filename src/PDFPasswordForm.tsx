@@ -2,6 +2,7 @@ import React, {useState, useRef, useMemo, type ChangeEvent, type FormEventHandle
 import PropTypes from 'prop-types';
 
 import {pdfPasswordFormStyles as styles} from './styles';
+import {isSafari} from './helpers';
 
 type Props = {
     isPasswordInvalid: boolean;
@@ -34,9 +35,6 @@ const defaultProps = {
     onPasswordChange: () => {},
     onPasswordFieldFocus: () => {},
 };
-
-// @ts-expect-error TODO: Comment
-const isSafari = Boolean(window.safari);
 
 function PDFPasswordForm({isPasswordInvalid, isFocused, onSubmit, onPasswordChange, onPasswordFieldFocus}: Props) {
     const [password, setPassword] = useState('');
@@ -135,7 +133,7 @@ function PDFPasswordForm({isPasswordInvalid, isFocused, onSubmit, onPasswordChan
                          * This is a workaround to bypass Safari's autofill odd behaviour.
                          * This tricks the browser not to fill the username somewhere else and still fill the password correctly.
                          */
-                        autoComplete={isSafari ? 'username' : 'off'}
+                        autoComplete={isSafari() ? 'username' : 'off'}
                         // eslint-disable-next-line jsx-a11y/no-autofocus
                         autoFocus={isFocused}
                         type="password"
