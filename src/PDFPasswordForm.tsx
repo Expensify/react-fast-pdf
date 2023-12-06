@@ -7,9 +7,9 @@ import {isSafari} from './helpers';
 type Props = {
     isPasswordInvalid: boolean;
     isFocused: boolean;
-    onSubmit: (password: string) => void;
-    onPasswordChange: (password: string) => void;
-    onPasswordFieldFocus: (isFocused: boolean) => void;
+    onSubmit?: (password: string) => void;
+    onPasswordChange?: (password: string) => void;
+    onPasswordFieldFocus?: (isFocused: boolean) => void;
 };
 
 const propTypes = {
@@ -59,7 +59,7 @@ function PDFPasswordForm({isPasswordInvalid, isFocused, onSubmit, onPasswordChan
         const newPassword = event.target.value;
 
         setPassword(newPassword);
-        onPasswordChange(newPassword);
+        onPasswordChange?.(newPassword);
         setValidationErrorText('');
     };
 
@@ -82,7 +82,7 @@ function PDFPasswordForm({isPasswordInvalid, isFocused, onSubmit, onPasswordChan
             return;
         }
 
-        onSubmit(password);
+        onSubmit?.(password);
     };
 
     const validateAndNotifyPasswordBlur = () => {
@@ -137,7 +137,7 @@ function PDFPasswordForm({isPasswordInvalid, isFocused, onSubmit, onPasswordChan
                         // eslint-disable-next-line jsx-a11y/no-autofocus
                         autoFocus={isFocused}
                         type="password"
-                        onFocus={() => onPasswordFieldFocus(true)}
+                        onFocus={() => onPasswordFieldFocus?.(true)}
                         onBlur={validateAndNotifyPasswordBlur}
                         onChange={updatePassword}
                     />
