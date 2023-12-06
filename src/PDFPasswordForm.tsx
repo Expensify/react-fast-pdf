@@ -5,7 +5,7 @@ import {pdfPasswordFormStyles as styles} from './styles';
 import {isSafari} from './helpers';
 
 type Props = {
-    isPasswordInvalid: boolean;
+    isPasswordInvalid?: boolean;
     isFocused: boolean;
     onSubmit?: (password: string) => void;
     onPasswordChange?: (password: string) => void;
