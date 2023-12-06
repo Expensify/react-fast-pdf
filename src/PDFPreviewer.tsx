@@ -30,19 +30,26 @@ type OnPasswordCallback = (password: string | null) => void;
  * when calculates the page width and height.
  */
 const PAGE_BORDER = 9;
+
 /**
  * Pages should be more narrow than the container on large screens. The app should take this size into account
  * when calculates the page width.
  */
 const LARGE_SCREEN_SIDE_SPACING = 40;
 
-// TODO: Comment
+/**
+ * An object in which additional parameters to be passed to PDF.js can be defined.
+ * 1. cMapUrl - The URL where the predefined Adobe CMaps are located. Include the trailing slash.
+ * 2. cMapPacked - specifies if the Adobe CMaps are binary packed or not. The default value is `true`.
+ */
 const DEFAULT_DOCUMENT_OPTIONS = {
     cMapUrl: 'cmaps/',
     cMapPacked: true,
 };
 
-// TODO: Comment
+/**
+ * Link target for external links rendered in annotations.
+ */
 const DEFAULT_EXTERNAL_LINK_TARGET = '_blank';
 
 /**
@@ -95,7 +102,7 @@ function PDFPreviewer({pageMaxWidth, isSmallScreen, file, containerStyle, conten
     const [shouldRequestPassword, setShouldRequestPassword] = useState(false);
     const [isPasswordInvalid, setIsPasswordInvalid] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
-    const onPasswordCallbackRef = useRef<OnPasswordCallback>(null);
+    const onPasswordCallbackRef = useRef<OnPasswordCallback | null>(null);
 
     /**
      * Calculates a proper page width.
@@ -163,7 +170,6 @@ function PDFPreviewer({pageMaxWidth, isSmallScreen, file, containerStyle, conten
      * because they're not exported in entry.webpack.
      */
     const initiatePasswordChallenge = (callback: OnPasswordCallback, reason: number) => {
-        // @ts-expect-error - TODO: fix an error
         onPasswordCallbackRef.current = callback;
 
         if (reason === PDF_PASSWORD_FORM_RESPONSES.NEED_PASSWORD) {
