@@ -1,3 +1,5 @@
+import {CSSProperties} from 'react';
+
 type Page = {
     getViewport: ({scale}: {scale: number}) => PageViewport;
 };
@@ -12,4 +14,8 @@ type PageViewport = {
     width: number;
 };
 
-export type {PDFDocument, PageViewport};
+type ComponentStyles = {
+    [key: string]: CSSProperties;
+};
+
+export type {PDFDocument, PageViewport, ComponentStyles};
