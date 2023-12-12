@@ -7,10 +7,15 @@
         url('../assets/fonts/ExpensifyNeue-Bold.woff') format('woff');
 }
 
+* {
+    margin: 0;
+    color: #e7ece9;
+    font-family: ExpensifyMono-Neue;
+}
+
 body {
     width: 100vw;
     height: 100vh;
-    margin: 0;
     overflow: hidden;
 }
 
@@ -29,11 +34,31 @@ body {
 }
 
 .title {
-    margin: 0 0 16px;
-    font-family: ExpensifyMono-Neue;
-    color: #e7ece9;
+    margin-bottom: 16px;
 }
 
 .react-pdf__Page {
     background-color: transparent !important;
+}
+
+.buttons_container {
+    margin-top: 16px;
+    display: flex;
+}
+
+.button {
+    margin: 0 8px;
+    padding: 8px 16px;
+    font-size: 18px;
+    border: 0;
+    border-radius: 16px;
+    background-color: #03d47c;
+    cursor: 'pointer';
+}
+
+.button_back {
+    position: absolute;
+    z-index: 1;
+    left: 16px;
+    top: 16px;
 }
