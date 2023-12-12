@@ -2,6 +2,8 @@
 
 Awesome PDF viewer, that combines the best of others into one tool.
 
+![Example](example/public/example.gif)
+
 # Features
 
 - Simple usage.
