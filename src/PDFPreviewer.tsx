@@ -198,7 +198,7 @@ function PDFPreviewer({pageMaxWidth, isSmallScreen, file, containerStyle, conten
             const pageWidth = calculatePageWidth();
 
             return (
-                <div style={style}>
+                <div style={{...style, display: 'flex'}}>
                     <Page
                         key={`page_${index}`}
                         width={pageWidth}

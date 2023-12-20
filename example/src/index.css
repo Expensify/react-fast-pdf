@@ -8,9 +8,12 @@
 }
 
 * {
-    margin: 0;
     color: #e7ece9;
     font-family: ExpensifyMono-Neue;
+}
+
+*:not(div) {
+    margin: 0;
 }
 
 body {
@@ -38,6 +41,8 @@ body {
 }
 
 .react-pdf__Page {
+    direction: ltr;
+    margin: 1px auto -8px auto;
     background-color: transparent !important;
 }
 
