@@ -1,5 +1,5 @@
 import React, {memo, useCallback, useLayoutEffect, useRef, useState} from 'react';
-import type {CSSProperties} from 'react';
+import type {CSSProperties, ReactNode} from 'react';
 import times from 'lodash/times';
 import PropTypes from 'prop-types';
 import {VariableSizeList as List} from 'react-window';
@@ -15,6 +15,8 @@ type Props = {
     file: string;
     pageMaxWidth: number;
     isSmallScreen: boolean;
+    LoadingComponent?: ReactNode;
+    ErrorComponent?: ReactNode;
     containerStyle?: CSSProperties;
     contentContainerStyle?: CSSProperties;
 };
@@ -81,6 +83,8 @@ const propTypes = {
     file: PropTypes.string.isRequired,
     pageMaxWidth: PropTypes.number.isRequired,
     isSmallScreen: PropTypes.bool.isRequired,
+    LoadingComponent: PropTypes.node,
+    ErrorComponent: PropTypes.node,
     // eslint-disable-next-line react/forbid-prop-types
     containerStyle: PropTypes.object,
     // eslint-disable-next-line react/forbid-prop-types
@@ -88,13 +92,15 @@ const propTypes = {
 };
 
 const defaultProps = {
+    LoadingComponent: <p>Loading...</p>,
+    ErrorComponent: <p>Failed to load the PDF file :(</p>,
     containerStyle: {},
     contentContainerStyle: {},
 };
 // @ts-expect-error - It is a recommended step for import worker - https://github.com/wojtekmaj/react-pdf/blob/main/packages/react-pdf/README.md#import-worker-recommended
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString();
 
-function PDFPreviewer({pageMaxWidth, isSmallScreen, file, containerStyle, contentContainerStyle}: Props) {
+function PDFPreviewer({pageMaxWidth, isSmallScreen, file, LoadingComponent, ErrorComponent, containerStyle, contentContainerStyle}: Props) {
     const [pageViewports, setPageViewports] = useState<PageViewport[]>([]);
     const [numPages, setNumPages] = useState(0);
     const [containerWidth, setContainerWidth] = useState(0);
@@ -227,8 +233,8 @@ function PDFPreviewer({pageMaxWidth, isSmallScreen, file, containerStyle, conten
                 file={file}
                 options={DEFAULT_DOCUMENT_OPTIONS}
                 externalLinkTarget={DEFAULT_EXTERNAL_LINK_TARGET}
-                error={<p>Failed to load the PDF file :(</p>}
-                loading={<p>Loading...</p>}
+                error={ErrorComponent}
+                loading={LoadingComponent}
                 onLoadSuccess={onDocumentLoadSuccess}
                 onPassword={initiatePasswordChallenge}
             >
