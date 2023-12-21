@@ -10,6 +10,8 @@ const pdfPreviewerStyles: ComponentStyles = {
          */
         display: 'grid',
         position: 'relative',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     list: {
         overflowX: 'hidden',
