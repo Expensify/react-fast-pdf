@@ -9,12 +9,13 @@ import 'react-pdf/dist/Page/TextLayer.css';
 
 import type {PDFDocument, PageViewport} from './types';
 import {pdfPreviewerStyles as styles} from './styles';
-import PDFPasswordForm from './PDFPasswordForm';
+import PDFPasswordForm, {type PDFPasswordFormProps} from './PDFPasswordForm';
 
 type Props = {
     file: string;
     pageMaxWidth: number;
     isSmallScreen: boolean;
+    PasswordFormComponent?: ({isPasswordInvalid, onSubmit, onPasswordChange, onPasswordFieldFocus}: PDFPasswordFormProps) => ReactNode;
     LoadingComponent?: ReactNode;
     ErrorComponent?: ReactNode;
     containerStyle?: CSSProperties;
@@ -83,6 +84,7 @@ const propTypes = {
     file: PropTypes.string.isRequired,
     pageMaxWidth: PropTypes.number.isRequired,
     isSmallScreen: PropTypes.bool.isRequired,
+    PasswordFormComponent: PropTypes.node,
     LoadingComponent: PropTypes.node,
     ErrorComponent: PropTypes.node,
     // eslint-disable-next-line react/forbid-prop-types
@@ -92,6 +94,7 @@ const propTypes = {
 };
 
 const defaultProps = {
+    PasswordFormComponent: null,
     LoadingComponent: <p>Loading...</p>,
     ErrorComponent: <p>Failed to load the PDF file :(</p>,
     containerStyle: {},
@@ -100,7 +103,7 @@ const defaultProps = {
 // @ts-expect-error - It is a recommended step for import worker - https://github.com/wojtekmaj/react-pdf/blob/main/packages/react-pdf/README.md#import-worker-recommended
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString();
 
-function PDFPreviewer({pageMaxWidth, isSmallScreen, file, LoadingComponent, ErrorComponent, containerStyle, contentContainerStyle}: Props) {
+function PDFPreviewer({pageMaxWidth, isSmallScreen, file, LoadingComponent, ErrorComponent, PasswordFormComponent, containerStyle, contentContainerStyle}: Props) {
     const [pageViewports, setPageViewports] = useState<PageViewport[]>([]);
     const [numPages, setNumPages] = useState(0);
     const [containerWidth, setContainerWidth] = useState(0);
@@ -219,6 +222,22 @@ function PDFPreviewer({pageMaxWidth, isSmallScreen, file, LoadingComponent, Erro
         [calculatePageWidth],
     );
 
+    /**
+     * Render a form to handle password typing.
+     * The method renders the passed or default component.
+     */
+    const renderPasswordForm = useCallback(() => {
+        const Component = PasswordFormComponent ?? PDFPasswordForm;
+
+        return (
+            <Component
+                isPasswordInvalid={isPasswordInvalid}
+                onSubmit={attemptPDFLoad}
+                onPasswordChange={() => setIsPasswordInvalid(false)}
+            />
+        );
+    }, [isPasswordInvalid, attemptPDFLoad, setIsPasswordInvalid, PasswordFormComponent]);
+
     useLayoutEffect(() => {
         setContainerWidth(containerRef.current?.clientWidth ?? 0);
         setContainerHeight(containerRef.current?.clientHeight ?? 0);
@@ -253,14 +272,7 @@ function PDFPreviewer({pageMaxWidth, isSmallScreen, file, LoadingComponent, Erro
                 )}
             </Document>
 
-            {shouldRequestPassword && (
-                <PDFPasswordForm
-                    isFocused
-                    isPasswordInvalid={isPasswordInvalid}
-                    onSubmit={attemptPDFLoad}
-                    onPasswordChange={() => setIsPasswordInvalid(false)}
-                />
-            )}
+            {shouldRequestPassword && renderPasswordForm()}
         </div>
     );
 }
