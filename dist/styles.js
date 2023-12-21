@@ -1,6 +1,7 @@
-import type {ComponentStyles} from './types';
-
-const pdfPreviewerStyles: ComponentStyles = {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.pdfPasswordFormStyles = exports.pdfPreviewerStyles = void 0;
+const pdfPreviewerStyles = {
     container: {
         width: '100%',
         height: '100%',
@@ -29,13 +30,13 @@ const pdfPreviewerStyles: ComponentStyles = {
         // There properties disable "focus" effect on list
         boxShadow: 'none',
         outline: 'none',
-    } as const,
+    },
     pageWrapper: {
         display: 'flex',
     },
 };
-
-const pdfPasswordFormStyles: ComponentStyles = {
+exports.pdfPreviewerStyles = pdfPreviewerStyles;
+const pdfPasswordFormStyles = {
     container: {
         display: 'flex',
         flexDirection: 'column',
@@ -85,5 +86,4 @@ const pdfPasswordFormStyles: ComponentStyles = {
         cursor: 'pointer',
     },
 };
-
-export {pdfPreviewerStyles, pdfPasswordFormStyles};
+exports.pdfPasswordFormStyles = pdfPasswordFormStyles;
