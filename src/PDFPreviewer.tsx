@@ -18,7 +18,7 @@ type Props = {
     maxCanvasWidth: number | null;
     maxCanvasHeight: number | null;
     maxCanvasArea: number | null;
-    renderPasswordForm?: ({isPasswordInvalid, onSubmit, onPasswordChange, onPasswordFieldFocus}: PDFPasswordFormProps) => ReactNode | null;
+    renderPasswordForm?: ({isPasswordInvalid, onSubmit, onPasswordChange}: Omit<PDFPasswordFormProps, 'onPasswordFieldFocus'>) => ReactNode | null;
     LoadingComponent?: ReactNode;
     ErrorComponent?: ReactNode;
     containerStyle?: CSSProperties;
