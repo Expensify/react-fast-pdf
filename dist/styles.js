@@ -20,6 +20,9 @@ const pdfPreviewerStyles = {
         boxShadow: 'none',
         outline: 'none',
     },
+    pageWrapper: {
+        display: 'flex',
+    },
 };
 exports.pdfPreviewerStyles = pdfPreviewerStyles;
 const pdfPasswordFormStyles = {

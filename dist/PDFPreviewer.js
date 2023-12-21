@@ -84,6 +84,9 @@ const propTypes = {
     file: prop_types_1.default.string.isRequired,
     pageMaxWidth: prop_types_1.default.number.isRequired,
     isSmallScreen: prop_types_1.default.bool.isRequired,
+    maxCanvasWidth: prop_types_1.default.number,
+    maxCanvasHeight: prop_types_1.default.number,
+    maxCanvasArea: prop_types_1.default.number,
     PasswordFormComponent: prop_types_1.default.node,
     LoadingComponent: prop_types_1.default.node,
     ErrorComponent: prop_types_1.default.node,
@@ -93,6 +96,9 @@ const propTypes = {
     contentContainerStyle: prop_types_1.default.object,
 };
 const defaultProps = {
+    maxCanvasWidth: null,
+    maxCanvasHeight: null,
+    maxCanvasArea: null,
     PasswordFormComponent: null,
     LoadingComponent: react_1.default.createElement("p", null, "Loading..."),
     ErrorComponent: react_1.default.createElement("p", null, "Failed to load the PDF file :("),
@@ -101,7 +107,7 @@ const defaultProps = {
 };
 // @ts-expect-error - It is a recommended step for import worker - https://github.com/wojtekmaj/react-pdf/blob/main/packages/react-pdf/README.md#import-worker-recommended
 react_pdf_1.pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString();
-function PDFPreviewer({ pageMaxWidth, isSmallScreen, file, LoadingComponent, ErrorComponent, PasswordFormComponent, containerStyle, contentContainerStyle }) {
+function PDFPreviewer({ file, pageMaxWidth, isSmallScreen, maxCanvasWidth, maxCanvasHeight, maxCanvasArea, LoadingComponent, ErrorComponent, PasswordFormComponent, containerStyle, contentContainerStyle, }) {
     const [pageViewports, setPageViewports] = (0, react_1.useState)([]);
     const [numPages, setNumPages] = (0, react_1.useState)(0);
     const [containerWidth, setContainerWidth] = (0, react_1.useState)(0);
@@ -110,6 +116,28 @@ function PDFPreviewer({ pageMaxWidth, isSmallScreen, file, LoadingComponent, Err
     const [isPasswordInvalid, setIsPasswordInvalid] = (0, react_1.useState)(false);
     const containerRef = (0, react_1.useRef)(null);
     const onPasswordCallbackRef = (0, react_1.useRef)(null);
+    /**
+     * Calculate the devicePixelRatio the page should be rendered with
+     * Each platform has a different default devicePixelRatio and different canvas limits, we need to verify that
+     * with the default devicePixelRatio it will be able to diplay the pdf correctly, if not we must change the devicePixelRatio.
+     * @param {Number} width of the page
+     * @param {Number} height of the page
+     * @returns {Number} devicePixelRatio for this page on this platform
+     */
+    const getDevicePixelRatio = (width, height) => {
+        if (!maxCanvasWidth || !maxCanvasHeight || !maxCanvasArea) {
+            return undefined;
+        }
+        const nbPixels = width * height;
+        const ratioHeight = maxCanvasHeight / height;
+        const ratioWidth = maxCanvasWidth / width;
+        const ratioArea = Math.sqrt(maxCanvasArea / nbPixels);
+        const ratio = Math.min(ratioHeight, ratioArea, ratioWidth);
+        if (ratio > window.devicePixelRatio) {
+            return undefined;
+        }
+        return ratio;
+    };
     /**
      * Calculates a proper page width.
      * It depends on a screen size. Also, the app should take into account the page borders.
@@ -181,16 +209,18 @@ function PDFPreviewer({ pageMaxWidth, isSmallScreen, file, LoadingComponent, Err
      * Render a specific page based on its index.
      * The method includes a wrapper to apply virtualized styles.
      */
-    const renderPage = (0, react_1.useCallback)(
+    const renderPage = 
     // eslint-disable-next-line react/no-unused-prop-types
     ({ index, style }) => {
         const pageWidth = calculatePageWidth();
-        return (react_1.default.createElement("div", { style: Object.assign(Object.assign({}, style), { display: 'flex' }) },
+        const pageHeight = calculatePageHeight(index);
+        const devicePixelRatio = getDevicePixelRatio(pageWidth, pageHeight);
+        return (react_1.default.createElement("div", { style: Object.assign(Object.assign({}, styles_1.pdfPreviewerStyles.pageWrapper), style) },
             react_1.default.createElement(react_pdf_1.Page, { key: `page_${index}`, width: pageWidth, pageIndex: index, 
                 // This needs to be empty to avoid multiple loading texts which show per page and look ugly
                 // See https://github.com/Expensify/App/issues/14358 for more details
-                loading: "" })));
-    }, [calculatePageWidth]);
+                loading: "", devicePixelRatio: devicePixelRatio })));
+    };
     /**
      * Render a form to handle password typing.
      * The method renders the passed or default component.
