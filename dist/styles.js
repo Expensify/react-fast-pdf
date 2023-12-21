@@ -14,6 +14,10 @@ const pdfPreviewerStyles = {
         alignItems: 'center',
         justifyContent: 'center',
     },
+    invisibleContainer: {
+        position: 'absolute',
+        opacity: 0,
+    },
     list: {
         overflowX: 'hidden',
         // There properties disable "focus" effect on list
@@ -31,12 +35,6 @@ const pdfPasswordFormStyles = {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        position: 'absolute',
-        zIndex: 1,
-        bottom: 0,
-        right: 0,
-        left: 0,
-        top: 0,
         backgroundColor: '#07271f',
     },
     infoMessage: {
