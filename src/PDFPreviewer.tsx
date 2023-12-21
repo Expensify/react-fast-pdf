@@ -308,29 +308,31 @@ function PDFPreviewer({
             ref={containerRef}
             style={{...styles.container, ...containerStyle}}
         >
-            <Document
-                file={file}
-                options={DEFAULT_DOCUMENT_OPTIONS}
-                externalLinkTarget={DEFAULT_EXTERNAL_LINK_TARGET}
-                error={ErrorComponent}
-                loading={LoadingComponent}
-                onLoadSuccess={onDocumentLoadSuccess}
-                onPassword={initiatePasswordChallenge}
-            >
-                {pageViewports.length > 0 && (
-                    <List
-                        style={{...styles.list, ...contentContainerStyle}}
-                        outerRef={setListAttributes}
-                        width={containerWidth}
-                        height={containerHeight}
-                        itemCount={numPages}
-                        itemSize={calculatePageHeight}
-                        estimatedItemSize={calculatePageHeight(0)}
-                    >
-                        {renderPage}
-                    </List>
-                )}
-            </Document>
+            <div style={shouldRequestPassword ? styles.invisibleContainer : {}}>
+                <Document
+                    file={file}
+                    options={DEFAULT_DOCUMENT_OPTIONS}
+                    externalLinkTarget={DEFAULT_EXTERNAL_LINK_TARGET}
+                    error={ErrorComponent}
+                    loading={LoadingComponent}
+                    onLoadSuccess={onDocumentLoadSuccess}
+                    onPassword={initiatePasswordChallenge}
+                >
+                    {pageViewports.length > 0 && (
+                        <List
+                            style={{...styles.list, ...contentContainerStyle}}
+                            outerRef={setListAttributes}
+                            width={containerWidth}
+                            height={containerHeight}
+                            itemCount={numPages}
+                            itemSize={calculatePageHeight}
+                            estimatedItemSize={calculatePageHeight(0)}
+                        >
+                            {renderPage}
+                        </List>
+                    )}
+                </Document>
+            </div>
 
             {shouldRequestPassword && _renderPasswordForm()}
         </div>
