@@ -19,6 +19,9 @@ const pdfPreviewerStyles: ComponentStyles = {
         boxShadow: 'none',
         outline: 'none',
     } as const,
+    pageWrapper: {
+        display: 'flex',
+    },
 };
 
 const pdfPasswordFormStyles: ComponentStyles = {

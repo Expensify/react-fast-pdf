@@ -15,6 +15,9 @@ type Props = {
     file: string;
     pageMaxWidth: number;
     isSmallScreen: boolean;
+    maxCanvasWidth: number;
+    maxCanvasHeight: number;
+    maxCanvasArea: number;
     PasswordFormComponent?: ({isPasswordInvalid, onSubmit, onPasswordChange, onPasswordFieldFocus}: PDFPasswordFormProps) => ReactNode;
     LoadingComponent?: ReactNode;
     ErrorComponent?: ReactNode;
@@ -84,6 +87,9 @@ const propTypes = {
     file: PropTypes.string.isRequired,
     pageMaxWidth: PropTypes.number.isRequired,
     isSmallScreen: PropTypes.bool.isRequired,
+    maxCanvasWidth: PropTypes.number,
+    maxCanvasHeight: PropTypes.number,
+    maxCanvasArea: PropTypes.number,
     PasswordFormComponent: PropTypes.node,
     LoadingComponent: PropTypes.node,
     ErrorComponent: PropTypes.node,
@@ -94,16 +100,32 @@ const propTypes = {
 };
 
 const defaultProps = {
+    maxCanvasWidth: undefined,
+    maxCanvasHeight: undefined,
+    maxCanvasArea: undefined,
     PasswordFormComponent: null,
     LoadingComponent: <p>Loading...</p>,
     ErrorComponent: <p>Failed to load the PDF file :(</p>,
     containerStyle: {},
     contentContainerStyle: {},
 };
+
 // @ts-expect-error - It is a recommended step for import worker - https://github.com/wojtekmaj/react-pdf/blob/main/packages/react-pdf/README.md#import-worker-recommended
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString();
 
-function PDFPreviewer({pageMaxWidth, isSmallScreen, file, LoadingComponent, ErrorComponent, PasswordFormComponent, containerStyle, contentContainerStyle}: Props) {
+function PDFPreviewer({
+    file,
+    pageMaxWidth,
+    isSmallScreen,
+    maxCanvasWidth,
+    maxCanvasHeight,
+    maxCanvasArea,
+    LoadingComponent,
+    ErrorComponent,
+    PasswordFormComponent,
+    containerStyle,
+    contentContainerStyle,
+}: Props) {
     const [pageViewports, setPageViewports] = useState<PageViewport[]>([]);
     const [numPages, setNumPages] = useState(0);
     const [containerWidth, setContainerWidth] = useState(0);
@@ -112,6 +134,24 @@ function PDFPreviewer({pageMaxWidth, isSmallScreen, file, LoadingComponent, Erro
     const [isPasswordInvalid, setIsPasswordInvalid] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
     const onPasswordCallbackRef = useRef<OnPasswordCallback | null>(null);
+
+    /**
+     * Calculate the devicePixelRatio the page should be rendered with
+     * Each platform has a different default devicePixelRatio and different canvas limits, we need to verify that
+     * with the default devicePixelRatio it will be able to diplay the pdf correctly, if not we must change the devicePixelRatio.
+     * @param {Number} width of the page
+     * @param {Number} height of the page
+     * @returns {Number} devicePixelRatio for this page on this platform
+     */
+    const getDevicePixelRatio = (width: number, height: number) => {
+        const nbPixels = width * height;
+        const ratioHeight = maxCanvasHeight / height;
+        const ratioWidth = maxCanvasWidth / width;
+        const ratioArea = Math.sqrt(maxCanvasArea / nbPixels);
+        const ratio = Math.min(ratioHeight, ratioArea, ratioWidth);
+
+        return ratio > window.devicePixelRatio ? undefined : ratio;
+    };
 
     /**
      * Calculates a proper page width.
@@ -205,9 +245,11 @@ function PDFPreviewer({pageMaxWidth, isSmallScreen, file, LoadingComponent, Erro
         // eslint-disable-next-line react/no-unused-prop-types
         ({index, style}: {index: number; style: object}) => {
             const pageWidth = calculatePageWidth();
+            const pageHeight = calculatePageHeight(index);
+            const devicePixelRatio = getDevicePixelRatio(pageWidth, pageHeight);
 
             return (
-                <div style={{...style, display: 'flex'}}>
+                <div style={{...styles.pageWrapper, ...style}}>
                     <Page
                         key={`page_${index}`}
                         width={pageWidth}
@@ -215,6 +257,7 @@ function PDFPreviewer({pageMaxWidth, isSmallScreen, file, LoadingComponent, Erro
                         // This needs to be empty to avoid multiple loading texts which show per page and look ugly
                         // See https://github.com/Expensify/App/issues/14358 for more details
                         loading=""
+                        devicePixelRatio={devicePixelRatio}
                     />
                 </div>
             );
