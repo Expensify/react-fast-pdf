@@ -33,8 +33,6 @@ const helpers_1 = require("./helpers");
 const propTypes = {
     /** If the submitted password is invalid (show an error message) */
     isPasswordInvalid: prop_types_1.default.bool,
-    /** Should focus to the password input  */
-    isFocused: prop_types_1.default.bool.isRequired,
     /** Notify parent that the password form has been submitted */
     onSubmit: prop_types_1.default.func,
     /** Notify parent that the password has been updated/edited */
@@ -48,7 +46,7 @@ const defaultProps = {
     onPasswordChange: () => { },
     onPasswordFieldFocus: () => { },
 };
-function PDFPasswordForm({ isPasswordInvalid, isFocused, onSubmit, onPasswordChange, onPasswordFieldFocus }) {
+function PDFPasswordForm({ isPasswordInvalid, onSubmit, onPasswordChange, onPasswordFieldFocus }) {
     const [password, setPassword] = (0, react_1.useState)('');
     const [validationErrorText, setValidationErrorText] = (0, react_1.useState)('');
     const [shouldShowForm, setShouldShowForm] = (0, react_1.useState)(false);
@@ -109,7 +107,7 @@ function PDFPasswordForm({ isPasswordInvalid, isFocused, onSubmit, onPasswordCha
                      */
                     autoComplete: (0, helpers_1.isSafari)() ? 'username' : 'off', 
                     // eslint-disable-next-line jsx-a11y/no-autofocus
-                    autoFocus: isFocused, type: "password", onFocus: () => onPasswordFieldFocus === null || onPasswordFieldFocus === void 0 ? void 0 : onPasswordFieldFocus(true), onBlur: validateAndNotifyPasswordBlur, onChange: updatePassword })),
+                    autoFocus: true, type: "password", onFocus: () => onPasswordFieldFocus === null || onPasswordFieldFocus === void 0 ? void 0 : onPasswordFieldFocus(true), onBlur: validateAndNotifyPasswordBlur, onChange: updatePassword })),
             !!errorText && react_1.default.createElement("p", { style: styles_1.pdfPasswordFormStyles.errorMessage }, errorText),
             react_1.default.createElement("input", { style: styles_1.pdfPasswordFormStyles.confirmButton, type: "submit", value: "Confirm" }))));
 }

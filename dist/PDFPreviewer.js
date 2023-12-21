@@ -84,6 +84,7 @@ const propTypes = {
     file: prop_types_1.default.string.isRequired,
     pageMaxWidth: prop_types_1.default.number.isRequired,
     isSmallScreen: prop_types_1.default.bool.isRequired,
+    PasswordFormComponent: prop_types_1.default.node,
     LoadingComponent: prop_types_1.default.node,
     ErrorComponent: prop_types_1.default.node,
     // eslint-disable-next-line react/forbid-prop-types
@@ -92,6 +93,7 @@ const propTypes = {
     contentContainerStyle: prop_types_1.default.object,
 };
 const defaultProps = {
+    PasswordFormComponent: null,
     LoadingComponent: react_1.default.createElement("p", null, "Loading..."),
     ErrorComponent: react_1.default.createElement("p", null, "Failed to load the PDF file :("),
     containerStyle: {},
@@ -99,7 +101,7 @@ const defaultProps = {
 };
 // @ts-expect-error - It is a recommended step for import worker - https://github.com/wojtekmaj/react-pdf/blob/main/packages/react-pdf/README.md#import-worker-recommended
 react_pdf_1.pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString();
-function PDFPreviewer({ pageMaxWidth, isSmallScreen, file, LoadingComponent, ErrorComponent, containerStyle, contentContainerStyle }) {
+function PDFPreviewer({ pageMaxWidth, isSmallScreen, file, LoadingComponent, ErrorComponent, PasswordFormComponent, containerStyle, contentContainerStyle }) {
     const [pageViewports, setPageViewports] = (0, react_1.useState)([]);
     const [numPages, setNumPages] = (0, react_1.useState)(0);
     const [containerWidth, setContainerWidth] = (0, react_1.useState)(0);
@@ -189,6 +191,14 @@ function PDFPreviewer({ pageMaxWidth, isSmallScreen, file, LoadingComponent, Err
                 // See https://github.com/Expensify/App/issues/14358 for more details
                 loading: "" })));
     }, [calculatePageWidth]);
+    /**
+     * Render a form to handle password typing.
+     * The method renders the passed or default component.
+     */
+    const renderPasswordForm = (0, react_1.useCallback)(() => {
+        const Component = PasswordFormComponent !== null && PasswordFormComponent !== void 0 ? PasswordFormComponent : PDFPasswordForm_1.default;
+        return (react_1.default.createElement(Component, { isPasswordInvalid: isPasswordInvalid, onSubmit: attemptPDFLoad, onPasswordChange: () => setIsPasswordInvalid(false) }));
+    }, [isPasswordInvalid, attemptPDFLoad, setIsPasswordInvalid, PasswordFormComponent]);
     (0, react_1.useLayoutEffect)(() => {
         var _a, _b, _c, _d;
         setContainerWidth((_b = (_a = containerRef.current) === null || _a === void 0 ? void 0 : _a.clientWidth) !== null && _b !== void 0 ? _b : 0);
@@ -196,7 +206,7 @@ function PDFPreviewer({ pageMaxWidth, isSmallScreen, file, LoadingComponent, Err
     }, []);
     return (react_1.default.createElement("div", { ref: containerRef, style: Object.assign(Object.assign({}, styles_1.pdfPreviewerStyles.container), containerStyle) },
         react_1.default.createElement(react_pdf_1.Document, { file: file, options: DEFAULT_DOCUMENT_OPTIONS, externalLinkTarget: DEFAULT_EXTERNAL_LINK_TARGET, error: ErrorComponent, loading: LoadingComponent, onLoadSuccess: onDocumentLoadSuccess, onPassword: initiatePasswordChallenge }, pageViewports.length > 0 && (react_1.default.createElement(react_window_1.VariableSizeList, { style: Object.assign(Object.assign({}, styles_1.pdfPreviewerStyles.list), contentContainerStyle), outerRef: setListAttributes, width: containerWidth, height: containerHeight, itemCount: numPages, itemSize: calculatePageHeight, estimatedItemSize: calculatePageHeight(0) }, renderPage))),
-        shouldRequestPassword && (react_1.default.createElement(PDFPasswordForm_1.default, { isFocused: true, isPasswordInvalid: isPasswordInvalid, onSubmit: attemptPDFLoad, onPasswordChange: () => setIsPasswordInvalid(false) }))));
+        shouldRequestPassword && renderPasswordForm()));
 }
 PDFPreviewer.propTypes = propTypes;
 PDFPreviewer.defaultProps = defaultProps;
