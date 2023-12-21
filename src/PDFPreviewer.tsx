@@ -15,9 +15,9 @@ type Props = {
     file: string;
     pageMaxWidth: number;
     isSmallScreen: boolean;
-    maxCanvasWidth: number;
-    maxCanvasHeight: number;
-    maxCanvasArea: number;
+    maxCanvasWidth: number | null;
+    maxCanvasHeight: number | null;
+    maxCanvasArea: number | null;
     PasswordFormComponent?: ({isPasswordInvalid, onSubmit, onPasswordChange, onPasswordFieldFocus}: PDFPasswordFormProps) => ReactNode;
     LoadingComponent?: ReactNode;
     ErrorComponent?: ReactNode;
@@ -100,9 +100,9 @@ const propTypes = {
 };
 
 const defaultProps = {
-    maxCanvasWidth: undefined,
-    maxCanvasHeight: undefined,
-    maxCanvasArea: undefined,
+    maxCanvasWidth: null,
+    maxCanvasHeight: null,
+    maxCanvasArea: null,
     PasswordFormComponent: null,
     LoadingComponent: <p>Loading...</p>,
     ErrorComponent: <p>Failed to load the PDF file :(</p>,
@@ -144,13 +144,21 @@ function PDFPreviewer({
      * @returns {Number} devicePixelRatio for this page on this platform
      */
     const getDevicePixelRatio = (width: number, height: number) => {
+        if (!maxCanvasWidth || !maxCanvasHeight || !maxCanvasArea) {
+            return undefined;
+        }
+
         const nbPixels = width * height;
         const ratioHeight = maxCanvasHeight / height;
         const ratioWidth = maxCanvasWidth / width;
         const ratioArea = Math.sqrt(maxCanvasArea / nbPixels);
         const ratio = Math.min(ratioHeight, ratioArea, ratioWidth);
 
-        return ratio > window.devicePixelRatio ? undefined : ratio;
+        if (ratio > window.devicePixelRatio) {
+            return undefined;
+        }
+
+        return ratio;
     };
 
     /**
@@ -241,7 +249,7 @@ function PDFPreviewer({
      * Render a specific page based on its index.
      * The method includes a wrapper to apply virtualized styles.
      */
-    const renderPage = useCallback(
+    const renderPage =
         // eslint-disable-next-line react/no-unused-prop-types
         ({index, style}: {index: number; style: object}) => {
             const pageWidth = calculatePageWidth();
@@ -261,9 +269,7 @@ function PDFPreviewer({
                     />
                 </div>
             );
-        },
-        [calculatePageWidth],
-    );
+        };
 
     /**
      * Render a form to handle password typing.
