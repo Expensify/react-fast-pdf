@@ -18,7 +18,7 @@ type Props = {
     maxCanvasWidth: number | null;
     maxCanvasHeight: number | null;
     maxCanvasArea: number | null;
-    PasswordFormComponent?: ({isPasswordInvalid, onSubmit, onPasswordChange, onPasswordFieldFocus}: PDFPasswordFormProps) => ReactNode;
+    renderPasswordForm?: ({isPasswordInvalid, onSubmit, onPasswordChange, onPasswordFieldFocus}: PDFPasswordFormProps) => ReactNode | null;
     LoadingComponent?: ReactNode;
     ErrorComponent?: ReactNode;
     containerStyle?: CSSProperties;
@@ -90,7 +90,7 @@ const propTypes = {
     maxCanvasWidth: PropTypes.number,
     maxCanvasHeight: PropTypes.number,
     maxCanvasArea: PropTypes.number,
-    PasswordFormComponent: PropTypes.node,
+    renderPasswordForm: PropTypes.func,
     LoadingComponent: PropTypes.node,
     ErrorComponent: PropTypes.node,
     // eslint-disable-next-line react/forbid-prop-types
@@ -103,7 +103,7 @@ const defaultProps = {
     maxCanvasWidth: null,
     maxCanvasHeight: null,
     maxCanvasArea: null,
-    PasswordFormComponent: null,
+    renderPasswordForm: null,
     LoadingComponent: <p>Loading...</p>,
     ErrorComponent: <p>Failed to load the PDF file :(</p>,
     containerStyle: {},
@@ -122,7 +122,7 @@ function PDFPreviewer({
     maxCanvasArea,
     LoadingComponent,
     ErrorComponent,
-    PasswordFormComponent,
+    renderPasswordForm,
     containerStyle,
     contentContainerStyle,
 }: Props) {
@@ -275,17 +275,28 @@ function PDFPreviewer({
      * Render a form to handle password typing.
      * The method renders the passed or default component.
      */
-    const renderPasswordForm = useCallback(() => {
-        const Component = PasswordFormComponent ?? PDFPasswordForm;
+
+    // eslint-disable-next-line no-underscore-dangle, @typescript-eslint/naming-convention
+    const _renderPasswordForm = useCallback(() => {
+        const onSubmit = attemptPDFLoad;
+        const onPasswordChange = () => setIsPasswordInvalid(false);
+
+        if (typeof renderPasswordForm === 'function') {
+            return renderPasswordForm({
+                isPasswordInvalid,
+                onSubmit,
+                onPasswordChange,
+            });
+        }
 
         return (
-            <Component
+            <PDFPasswordForm
                 isPasswordInvalid={isPasswordInvalid}
-                onSubmit={attemptPDFLoad}
-                onPasswordChange={() => setIsPasswordInvalid(false)}
+                onSubmit={onSubmit}
+                onPasswordChange={onPasswordChange}
             />
         );
-    }, [isPasswordInvalid, attemptPDFLoad, setIsPasswordInvalid, PasswordFormComponent]);
+    }, [isPasswordInvalid, attemptPDFLoad, setIsPasswordInvalid, renderPasswordForm]);
 
     useLayoutEffect(() => {
         setContainerWidth(containerRef.current?.clientWidth ?? 0);
@@ -321,7 +332,7 @@ function PDFPreviewer({
                 )}
             </Document>
 
-            {shouldRequestPassword && renderPasswordForm()}
+            {shouldRequestPassword && _renderPasswordForm()}
         </div>
     );
 }
