@@ -11,13 +11,13 @@ type Props = {
     maxCanvasWidth: number | null;
     maxCanvasHeight: number | null;
     maxCanvasArea: number | null;
-    PasswordFormComponent?: ({ isPasswordInvalid, onSubmit, onPasswordChange, onPasswordFieldFocus }: PDFPasswordFormProps) => ReactNode;
+    renderPasswordForm?: ({ isPasswordInvalid, onSubmit, onPasswordChange, onPasswordFieldFocus }: PDFPasswordFormProps) => ReactNode | null;
     LoadingComponent?: ReactNode;
     ErrorComponent?: ReactNode;
     containerStyle?: CSSProperties;
     contentContainerStyle?: CSSProperties;
 };
-declare function PDFPreviewer({ file, pageMaxWidth, isSmallScreen, maxCanvasWidth, maxCanvasHeight, maxCanvasArea, LoadingComponent, ErrorComponent, PasswordFormComponent, containerStyle, contentContainerStyle, }: Props): React.JSX.Element;
+declare function PDFPreviewer({ file, pageMaxWidth, isSmallScreen, maxCanvasWidth, maxCanvasHeight, maxCanvasArea, LoadingComponent, ErrorComponent, renderPasswordForm, containerStyle, contentContainerStyle, }: Props): React.JSX.Element;
 declare namespace PDFPreviewer {
     var propTypes: {
         file: PropTypes.Validator<string>;
@@ -26,7 +26,7 @@ declare namespace PDFPreviewer {
         maxCanvasWidth: PropTypes.Requireable<number>;
         maxCanvasHeight: PropTypes.Requireable<number>;
         maxCanvasArea: PropTypes.Requireable<number>;
-        PasswordFormComponent: PropTypes.Requireable<PropTypes.ReactNodeLike>;
+        renderPasswordForm: PropTypes.Requireable<(...args: any[]) => any>;
         LoadingComponent: PropTypes.Requireable<PropTypes.ReactNodeLike>;
         ErrorComponent: PropTypes.Requireable<PropTypes.ReactNodeLike>;
         containerStyle: PropTypes.Requireable<object>;
@@ -36,7 +36,7 @@ declare namespace PDFPreviewer {
         maxCanvasWidth: null;
         maxCanvasHeight: null;
         maxCanvasArea: null;
-        PasswordFormComponent: null;
+        renderPasswordForm: null;
         LoadingComponent: React.JSX.Element;
         ErrorComponent: React.JSX.Element;
         containerStyle: {};
