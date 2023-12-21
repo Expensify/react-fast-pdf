@@ -4,18 +4,25 @@ const pdfPreviewerStyles: ComponentStyles = {
     container: {
         width: '100%',
         height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    innerContainer: {
+        width: '100%',
+        height: '100%',
         /**
          * It's being used on Web/Desktop only to vertically center short PDFs,
          * while preventing the overflow of the top of long PDF files.
          */
         display: 'grid',
-        position: 'relative',
         alignItems: 'center',
         justifyContent: 'center',
     },
     invisibleContainer: {
         position: 'absolute',
         opacity: 0,
+        zIndex: -1,
     },
     list: {
         overflowX: 'hidden',

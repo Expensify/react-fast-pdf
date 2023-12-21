@@ -308,7 +308,7 @@ function PDFPreviewer({
             ref={containerRef}
             style={{...styles.container, ...containerStyle}}
         >
-            <div style={shouldRequestPassword ? styles.invisibleContainer : {}}>
+            <div style={{...styles.innerContainer, ...(shouldRequestPassword ? styles.invisibleContainer : {})}}>
                 <Document
                     file={file}
                     options={DEFAULT_DOCUMENT_OPTIONS}
