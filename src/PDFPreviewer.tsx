@@ -3,13 +3,16 @@ import type {CSSProperties, ReactNode} from 'react';
 import times from 'lodash/times';
 import PropTypes from 'prop-types';
 import {VariableSizeList as List} from 'react-window';
-import {Document, Page, pdfjs} from 'react-pdf';
+import {Document, pdfjs} from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
 import type {PDFDocument, PageViewport} from './types';
 import {pdfPreviewerStyles as styles} from './styles';
 import PDFPasswordForm, {type PDFPasswordFormProps} from './PDFPasswordForm';
+import PageRenderer from './PageRenderer';
+import {PAGE_BORDER, LARGE_SCREEN_SIDE_SPACING, DEFAULT_DOCUMENT_OPTIONS, DEFAULT_EXTERNAL_LINK_TARGET, PDF_PASSWORD_FORM_RESPONSES} from './constants';
+import {setListAttributes} from './helpers';
 
 type Props = {
     file: string;
@@ -25,63 +28,7 @@ type Props = {
     contentContainerStyle?: CSSProperties;
 };
 
-type ListRef = {
-    tabIndex: number;
-};
-
 type OnPasswordCallback = (password: string | null) => void;
-
-/**
- * Each page has a default border. The app should take this size into account
- * when calculates the page width and height.
- */
-const PAGE_BORDER = 9;
-
-/**
- * Pages should be more narrow than the container on large screens. The app should take this size into account
- * when calculates the page width.
- */
-const LARGE_SCREEN_SIDE_SPACING = 40;
-
-/**
- * An object in which additional parameters to be passed to PDF.js can be defined.
- * 1. cMapUrl - The URL where the predefined Adobe CMaps are located. Include the trailing slash.
- * 2. cMapPacked - specifies if the Adobe CMaps are binary packed or not. The default value is `true`.
- */
-const DEFAULT_DOCUMENT_OPTIONS = {
-    cMapUrl: 'cmaps/',
-    cMapPacked: true,
-};
-
-/**
- * Link target for external links rendered in annotations.
- */
-const DEFAULT_EXTERNAL_LINK_TARGET = '_blank';
-
-/**
- * Constants for password-related error responses received from react-pdf.
- */
-const PDF_PASSWORD_FORM_RESPONSES = {
-    NEED_PASSWORD: 1,
-    INCORRECT_PASSWORD: 2,
-};
-
-/**
- * Sets attributes to list container.
- * It unblocks a default scroll by keyboard of browsers.
- */
-const setListAttributes = (ref: ListRef | undefined) => {
-    if (!ref) {
-        return;
-    }
-
-    /**
-     *  Useful for elements that should not be navigated to directly using the "Tab" key,
-     * but need to have keyboard focus set to them.
-     */
-    // eslint-disable-next-line no-param-reassign
-    ref.tabIndex = -1;
-};
 
 const propTypes = {
     file: PropTypes.string.isRequired,
@@ -143,7 +90,7 @@ function PDFPreviewer({
      * @param {Number} height of the page
      * @returns {Number} devicePixelRatio for this page on this platform
      */
-    const getDevicePixelRatio = (width: number, height: number) => {
+    const getDevicePixelRatio = (width: number, height: number): number | undefined => {
         if (!maxCanvasWidth || !maxCanvasHeight || !maxCanvasArea) {
             return undefined;
         }
@@ -192,6 +139,9 @@ function PDFPreviewer({
         },
         [pageViewports, calculatePageWidth],
     );
+
+    const estimatedPageHeight = calculatePageHeight(0);
+    const pageWidth = calculatePageWidth();
 
     /**
      * Upon successful document load, combine an array of page viewports,
@@ -246,38 +196,10 @@ function PDFPreviewer({
     };
 
     /**
-     * Render a specific page based on its index.
-     * The method includes a wrapper to apply virtualized styles.
-     */
-    const renderPage =
-        // eslint-disable-next-line react/no-unused-prop-types
-        ({index, style}: {index: number; style: object}) => {
-            const pageWidth = calculatePageWidth();
-            const pageHeight = calculatePageHeight(index);
-            const devicePixelRatio = getDevicePixelRatio(pageWidth, pageHeight);
-
-            return (
-                <div style={{...styles.pageWrapper, ...style}}>
-                    <Page
-                        key={`page_${index}`}
-                        width={pageWidth}
-                        pageIndex={index}
-                        // This needs to be empty to avoid multiple loading texts which show per page and look ugly
-                        // See https://github.com/Expensify/App/issues/14358 for more details
-                        loading=""
-                        devicePixelRatio={devicePixelRatio}
-                    />
-                </div>
-            );
-        };
-
-    /**
      * Render a form to handle password typing.
      * The method renders the passed or default component.
      */
-
-    // eslint-disable-next-line no-underscore-dangle, @typescript-eslint/naming-convention
-    const _renderPasswordForm = useCallback(() => {
+    const internalRenderPasswordForm = useCallback(() => {
         const onSubmit = attemptPDFLoad;
         const onPasswordChange = () => setIsPasswordInvalid(false);
 
@@ -327,14 +249,15 @@ function PDFPreviewer({
                             itemCount={numPages}
                             itemSize={calculatePageHeight}
                             estimatedItemSize={calculatePageHeight(0)}
+                            itemData={{pageWidth, estimatedPageHeight, calculatePageHeight, getDevicePixelRatio}}
                         >
-                            {renderPage}
+                            {PageRenderer}
                         </List>
                     )}
                 </Document>
             </div>
 
-            {shouldRequestPassword && _renderPasswordForm()}
+            {shouldRequestPassword && internalRenderPasswordForm()}
         </div>
     );
 }
