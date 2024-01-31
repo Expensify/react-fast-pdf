@@ -262,6 +262,7 @@ function PDFPreviewer({
     );
 }
 
+PDFPasswordForm.displayName = 'PDFPreviewer';
 PDFPreviewer.propTypes = propTypes;
 PDFPreviewer.defaultProps = defaultProps;
 
