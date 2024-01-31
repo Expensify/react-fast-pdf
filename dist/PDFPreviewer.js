@@ -191,6 +191,7 @@ function PDFPreviewer({ file, pageMaxWidth, isSmallScreen, maxCanvasWidth, maxCa
             react_1.default.createElement(react_pdf_1.Document, { file: file, options: constants_1.DEFAULT_DOCUMENT_OPTIONS, externalLinkTarget: constants_1.DEFAULT_EXTERNAL_LINK_TARGET, error: ErrorComponent, loading: LoadingComponent, onLoadSuccess: onDocumentLoadSuccess, onPassword: initiatePasswordChallenge }, pageViewports.length > 0 && (react_1.default.createElement(react_window_1.VariableSizeList, { style: Object.assign(Object.assign({}, styles_1.pdfPreviewerStyles.list), contentContainerStyle), outerRef: helpers_1.setListAttributes, width: pageWidth, height: containerHeight, itemCount: numPages, itemSize: calculatePageHeight, estimatedItemSize: calculatePageHeight(0), itemData: { pageWidth, estimatedPageHeight, calculatePageHeight, getDevicePixelRatio } }, PageRenderer_1.default)))),
         shouldRequestPassword && internalRenderPasswordForm()));
 }
+PDFPasswordForm_1.default.displayName = 'PDFPreviewer';
 PDFPreviewer.propTypes = propTypes;
 PDFPreviewer.defaultProps = defaultProps;
 exports.default = (0, react_1.memo)(PDFPreviewer);

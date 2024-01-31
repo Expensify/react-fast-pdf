@@ -19,6 +19,7 @@ const pdfPreviewerStyles = {
         display: 'grid',
         alignItems: 'center',
         justifyContent: 'center',
+        overflow: 'hidden',
     },
     invisibleContainer: {
         position: 'absolute',
