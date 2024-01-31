@@ -35,51 +35,9 @@ require("react-pdf/dist/Page/AnnotationLayer.css");
 require("react-pdf/dist/Page/TextLayer.css");
 const styles_1 = require("./styles");
 const PDFPasswordForm_1 = __importDefault(require("./PDFPasswordForm"));
-/**
- * Each page has a default border. The app should take this size into account
- * when calculates the page width and height.
- */
-const PAGE_BORDER = 9;
-/**
- * Pages should be more narrow than the container on large screens. The app should take this size into account
- * when calculates the page width.
- */
-const LARGE_SCREEN_SIDE_SPACING = 40;
-/**
- * An object in which additional parameters to be passed to PDF.js can be defined.
- * 1. cMapUrl - The URL where the predefined Adobe CMaps are located. Include the trailing slash.
- * 2. cMapPacked - specifies if the Adobe CMaps are binary packed or not. The default value is `true`.
- */
-const DEFAULT_DOCUMENT_OPTIONS = {
-    cMapUrl: 'cmaps/',
-    cMapPacked: true,
-};
-/**
- * Link target for external links rendered in annotations.
- */
-const DEFAULT_EXTERNAL_LINK_TARGET = '_blank';
-/**
- * Constants for password-related error responses received from react-pdf.
- */
-const PDF_PASSWORD_FORM_RESPONSES = {
-    NEED_PASSWORD: 1,
-    INCORRECT_PASSWORD: 2,
-};
-/**
- * Sets attributes to list container.
- * It unblocks a default scroll by keyboard of browsers.
- */
-const setListAttributes = (ref) => {
-    if (!ref) {
-        return;
-    }
-    /**
-     *  Useful for elements that should not be navigated to directly using the "Tab" key,
-     * but need to have keyboard focus set to them.
-     */
-    // eslint-disable-next-line no-param-reassign
-    ref.tabIndex = -1;
-};
+const PageRenderer_1 = __importDefault(require("./PageRenderer"));
+const constants_1 = require("./constants");
+const helpers_1 = require("./helpers");
 const propTypes = {
     file: prop_types_1.default.string.isRequired,
     pageMaxWidth: prop_types_1.default.number.isRequired,
@@ -143,9 +101,9 @@ function PDFPreviewer({ file, pageMaxWidth, isSmallScreen, maxCanvasWidth, maxCa
      * It depends on a screen size. Also, the app should take into account the page borders.
      */
     const calculatePageWidth = (0, react_1.useCallback)(() => {
-        const pageWidthOnLargeScreen = Math.min(containerWidth - LARGE_SCREEN_SIDE_SPACING * 2, pageMaxWidth);
+        const pageWidthOnLargeScreen = Math.min(containerWidth - constants_1.LARGE_SCREEN_SIDE_SPACING * 2, pageMaxWidth);
         const pageWidth = isSmallScreen ? containerWidth : pageWidthOnLargeScreen;
-        return pageWidth + PAGE_BORDER * 2;
+        return pageWidth + constants_1.PAGE_BORDER * 2;
     }, [containerWidth, pageMaxWidth, isSmallScreen]);
     /**
      * Calculates a proper page height. The method should be called only when there are page viewports.
@@ -159,8 +117,10 @@ function PDFPreviewer({ file, pageMaxWidth, isSmallScreen, maxCanvasWidth, maxCa
         const pageWidth = calculatePageWidth();
         const { width: pageViewportWidth, height: pageViewportHeight } = pageViewports[pageIndex];
         const scale = pageWidth / pageViewportWidth;
-        return pageViewportHeight * scale + PAGE_BORDER * 2;
+        return pageViewportHeight * scale + constants_1.PAGE_BORDER * 2;
     }, [pageViewports, calculatePageWidth]);
+    const estimatedPageHeight = calculatePageHeight(0);
+    const pageWidth = calculatePageWidth();
     /**
      * Upon successful document load, combine an array of page viewports,
      * set the number of pages on PDF,
@@ -189,10 +149,10 @@ function PDFPreviewer({ file, pageMaxWidth, isSmallScreen, maxCanvasWidth, maxCa
      */
     const initiatePasswordChallenge = (callback, reason) => {
         onPasswordCallbackRef.current = callback;
-        if (reason === PDF_PASSWORD_FORM_RESPONSES.NEED_PASSWORD) {
+        if (reason === constants_1.PDF_PASSWORD_FORM_RESPONSES.NEED_PASSWORD) {
             setShouldRequestPassword(true);
         }
-        else if (reason === PDF_PASSWORD_FORM_RESPONSES.INCORRECT_PASSWORD) {
+        else if (reason === constants_1.PDF_PASSWORD_FORM_RESPONSES.INCORRECT_PASSWORD) {
             setShouldRequestPassword(true);
             setIsPasswordInvalid(true);
         }
@@ -206,27 +166,10 @@ function PDFPreviewer({ file, pageMaxWidth, isSmallScreen, maxCanvasWidth, maxCa
         (_a = onPasswordCallbackRef.current) === null || _a === void 0 ? void 0 : _a.call(onPasswordCallbackRef, password);
     };
     /**
-     * Render a specific page based on its index.
-     * The method includes a wrapper to apply virtualized styles.
-     */
-    const renderPage = 
-    // eslint-disable-next-line react/no-unused-prop-types
-    ({ index, style }) => {
-        const pageWidth = calculatePageWidth();
-        const pageHeight = calculatePageHeight(index);
-        const devicePixelRatio = getDevicePixelRatio(pageWidth, pageHeight);
-        return (react_1.default.createElement("div", { style: Object.assign(Object.assign({}, styles_1.pdfPreviewerStyles.pageWrapper), style) },
-            react_1.default.createElement(react_pdf_1.Page, { key: `page_${index}`, width: pageWidth, pageIndex: index, 
-                // This needs to be empty to avoid multiple loading texts which show per page and look ugly
-                // See https://github.com/Expensify/App/issues/14358 for more details
-                loading: "", devicePixelRatio: devicePixelRatio })));
-    };
-    /**
      * Render a form to handle password typing.
      * The method renders the passed or default component.
      */
-    // eslint-disable-next-line no-underscore-dangle, @typescript-eslint/naming-convention
-    const _renderPasswordForm = (0, react_1.useCallback)(() => {
+    const internalRenderPasswordForm = (0, react_1.useCallback)(() => {
         const onSubmit = attemptPDFLoad;
         const onPasswordChange = () => setIsPasswordInvalid(false);
         if (typeof renderPasswordForm === 'function') {
@@ -245,8 +188,8 @@ function PDFPreviewer({ file, pageMaxWidth, isSmallScreen, maxCanvasWidth, maxCa
     }, []);
     return (react_1.default.createElement("div", { ref: containerRef, style: Object.assign(Object.assign({}, styles_1.pdfPreviewerStyles.container), containerStyle) },
         react_1.default.createElement("div", { style: Object.assign(Object.assign({}, styles_1.pdfPreviewerStyles.innerContainer), (shouldRequestPassword ? styles_1.pdfPreviewerStyles.invisibleContainer : {})) },
-            react_1.default.createElement(react_pdf_1.Document, { file: file, options: DEFAULT_DOCUMENT_OPTIONS, externalLinkTarget: DEFAULT_EXTERNAL_LINK_TARGET, error: ErrorComponent, loading: LoadingComponent, onLoadSuccess: onDocumentLoadSuccess, onPassword: initiatePasswordChallenge }, pageViewports.length > 0 && (react_1.default.createElement(react_window_1.VariableSizeList, { style: Object.assign(Object.assign({}, styles_1.pdfPreviewerStyles.list), contentContainerStyle), outerRef: setListAttributes, width: containerWidth, height: containerHeight, itemCount: numPages, itemSize: calculatePageHeight, estimatedItemSize: calculatePageHeight(0) }, renderPage)))),
-        shouldRequestPassword && _renderPasswordForm()));
+            react_1.default.createElement(react_pdf_1.Document, { file: file, options: constants_1.DEFAULT_DOCUMENT_OPTIONS, externalLinkTarget: constants_1.DEFAULT_EXTERNAL_LINK_TARGET, error: ErrorComponent, loading: LoadingComponent, onLoadSuccess: onDocumentLoadSuccess, onPassword: initiatePasswordChallenge }, pageViewports.length > 0 && (react_1.default.createElement(react_window_1.VariableSizeList, { style: Object.assign(Object.assign({}, styles_1.pdfPreviewerStyles.list), contentContainerStyle), outerRef: helpers_1.setListAttributes, width: containerWidth, height: containerHeight, itemCount: numPages, itemSize: calculatePageHeight, estimatedItemSize: calculatePageHeight(0), itemData: { pageWidth, estimatedPageHeight, calculatePageHeight, getDevicePixelRatio } }, PageRenderer_1.default)))),
+        shouldRequestPassword && internalRenderPasswordForm()));
 }
 PDFPreviewer.propTypes = propTypes;
 PDFPreviewer.defaultProps = defaultProps;

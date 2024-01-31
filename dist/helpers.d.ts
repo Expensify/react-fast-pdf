@@ -7,5 +7,13 @@ declare const getBrowser: () => string;
  */
 declare const isMobileSafari: () => boolean;
 declare const isSafari: () => boolean;
-export { getBrowser, isMobileSafari, isSafari };
+type ListRef = {
+    tabIndex: number;
+};
+/**
+ * Sets attributes to list container.
+ * It unblocks a default scroll by keyboard of browsers.
+ */
+declare const setListAttributes: (ref: ListRef | undefined) => void;
+export { getBrowser, isMobileSafari, isSafari, setListAttributes };
 //# sourceMappingURL=helpers.d.ts.map

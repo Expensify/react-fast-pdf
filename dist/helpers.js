@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isSafari = exports.isMobileSafari = exports.getBrowser = void 0;
+exports.setListAttributes = exports.isSafari = exports.isMobileSafari = exports.getBrowser = void 0;
 /**
  * Fetch browser name from UA string
  */
@@ -37,3 +37,19 @@ const isMobileSafari = () => {
 exports.isMobileSafari = isMobileSafari;
 const isSafari = () => getBrowser() === 'safari' || isMobileSafari();
 exports.isSafari = isSafari;
+/**
+ * Sets attributes to list container.
+ * It unblocks a default scroll by keyboard of browsers.
+ */
+const setListAttributes = (ref) => {
+    if (!ref) {
+        return;
+    }
+    /**
+     *  Useful for elements that should not be navigated to directly using the "Tab" key,
+     * but need to have keyboard focus set to them.
+     */
+    // eslint-disable-next-line no-param-reassign
+    ref.tabIndex = -1;
+};
+exports.setListAttributes = setListAttributes;
