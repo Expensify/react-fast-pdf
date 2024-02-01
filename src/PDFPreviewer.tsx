@@ -244,7 +244,7 @@ function PDFPreviewer({
                         <List
                             style={{...styles.list, ...contentContainerStyle}}
                             outerRef={setListAttributes}
-                            width={pageWidth}
+                            width={isSmallScreen ? pageWidth : containerWidth}
                             height={containerHeight}
                             itemCount={numPages}
                             itemSize={calculatePageHeight}
