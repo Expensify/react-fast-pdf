@@ -51,7 +51,7 @@ function App() {
                             type="button"
                             onClick={() => setFile('example_protected.pdf')}
                         >
-                            example_protected.pdf
+                            example_protected.pdf (Password: 123456)
                         </button>
                     </div>
                 </>
