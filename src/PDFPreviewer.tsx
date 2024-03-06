@@ -2,88 +2,47 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import pdfWorkerSource from 'pdfjs-dist/legacy/build/pdf.worker';
 import React, {memo, useCallback, useLayoutEffect, useRef, useState} from 'react';
-import type {CSSProperties} from 'react';
+import type {CSSProperties, ReactNode} from 'react';
 import times from 'lodash/times';
 import PropTypes from 'prop-types';
 import {VariableSizeList as List} from 'react-window';
-import {Document, Page, pdfjs} from 'react-pdf';
+import {Document, pdfjs} from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
 import type {PDFDocument, PageViewport} from './types';
 import {pdfPreviewerStyles as styles} from './styles';
-import PDFPasswordForm from './PDFPasswordForm';
+import PDFPasswordForm, {type PDFPasswordFormProps} from './PDFPasswordForm';
+import PageRenderer from './PageRenderer';
+import {PAGE_BORDER, LARGE_SCREEN_SIDE_SPACING, DEFAULT_DOCUMENT_OPTIONS, DEFAULT_EXTERNAL_LINK_TARGET, PDF_PASSWORD_FORM_RESPONSES} from './constants';
+import {setListAttributes} from './helpers';
 
 type Props = {
     file: string;
     pageMaxWidth: number;
     isSmallScreen: boolean;
+    maxCanvasWidth: number | null;
+    maxCanvasHeight: number | null;
+    maxCanvasArea: number | null;
+    renderPasswordForm?: ({isPasswordInvalid, onSubmit, onPasswordChange}: Omit<PDFPasswordFormProps, 'onPasswordFieldFocus'>) => ReactNode | null;
+    LoadingComponent?: ReactNode;
+    ErrorComponent?: ReactNode;
     containerStyle?: CSSProperties;
     contentContainerStyle?: CSSProperties;
 };
 
-type ListRef = {
-    tabIndex: number;
-};
-
 type OnPasswordCallback = (password: string | null) => void;
-
-/**
- * Each page has a default border. The app should take this size into account
- * when calculates the page width and height.
- */
-const PAGE_BORDER = 9;
-
-/**
- * Pages should be more narrow than the container on large screens. The app should take this size into account
- * when calculates the page width.
- */
-const LARGE_SCREEN_SIDE_SPACING = 40;
-
-/**
- * An object in which additional parameters to be passed to PDF.js can be defined.
- * 1. cMapUrl - The URL where the predefined Adobe CMaps are located. Include the trailing slash.
- * 2. cMapPacked - specifies if the Adobe CMaps are binary packed or not. The default value is `true`.
- */
-const DEFAULT_DOCUMENT_OPTIONS = {
-    cMapUrl: 'cmaps/',
-    cMapPacked: true,
-};
-
-/**
- * Link target for external links rendered in annotations.
- */
-const DEFAULT_EXTERNAL_LINK_TARGET = '_blank';
-
-/**
- * Constants for password-related error responses received from react-pdf.
- */
-const PDF_PASSWORD_FORM_RESPONSES = {
-    NEED_PASSWORD: 1,
-    INCORRECT_PASSWORD: 2,
-};
-
-/**
- * Sets attributes to list container.
- * It unblocks a default scroll by keyboard of browsers.
- */
-const setListAttributes = (ref: ListRef | undefined) => {
-    if (!ref) {
-        return;
-    }
-
-    /**
-     *  Useful for elements that should not be navigated to directly using the "Tab" key,
-     * but need to have keyboard focus set to them.
-     */
-    // eslint-disable-next-line no-param-reassign
-    ref.tabIndex = -1;
-};
 
 const propTypes = {
     file: PropTypes.string.isRequired,
     pageMaxWidth: PropTypes.number.isRequired,
     isSmallScreen: PropTypes.bool.isRequired,
+    maxCanvasWidth: PropTypes.number,
+    maxCanvasHeight: PropTypes.number,
+    maxCanvasArea: PropTypes.number,
+    renderPasswordForm: PropTypes.func,
+    LoadingComponent: PropTypes.node,
+    ErrorComponent: PropTypes.node,
     // eslint-disable-next-line react/forbid-prop-types
     containerStyle: PropTypes.object,
     // eslint-disable-next-line react/forbid-prop-types
@@ -91,13 +50,31 @@ const propTypes = {
 };
 
 const defaultProps = {
+    maxCanvasWidth: null,
+    maxCanvasHeight: null,
+    maxCanvasArea: null,
+    renderPasswordForm: null,
+    LoadingComponent: <p>Loading...</p>,
+    ErrorComponent: <p>Failed to load the PDF file :(</p>,
     containerStyle: {},
     contentContainerStyle: {},
 };
 
 pdfjs.GlobalWorkerOptions.workerSrc = URL.createObjectURL(new Blob([pdfWorkerSource], {type: 'text/javascript'}));
 
-function PDFPreviewer({pageMaxWidth, isSmallScreen, file, containerStyle, contentContainerStyle}: Props) {
+function PDFPreviewer({
+    file,
+    pageMaxWidth,
+    isSmallScreen,
+    maxCanvasWidth,
+    maxCanvasHeight,
+    maxCanvasArea,
+    LoadingComponent,
+    ErrorComponent,
+    renderPasswordForm,
+    containerStyle,
+    contentContainerStyle,
+}: Props) {
     const [pageViewports, setPageViewports] = useState<PageViewport[]>([]);
     const [numPages, setNumPages] = useState(0);
     const [containerWidth, setContainerWidth] = useState(0);
@@ -106,6 +83,32 @@ function PDFPreviewer({pageMaxWidth, isSmallScreen, file, containerStyle, conten
     const [isPasswordInvalid, setIsPasswordInvalid] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
     const onPasswordCallbackRef = useRef<OnPasswordCallback | null>(null);
+
+    /**
+     * Calculate the devicePixelRatio the page should be rendered with
+     * Each platform has a different default devicePixelRatio and different canvas limits, we need to verify that
+     * with the default devicePixelRatio it will be able to diplay the pdf correctly, if not we must change the devicePixelRatio.
+     * @param {Number} width of the page
+     * @param {Number} height of the page
+     * @returns {Number} devicePixelRatio for this page on this platform
+     */
+    const getDevicePixelRatio = (width: number, height: number): number | undefined => {
+        if (!maxCanvasWidth || !maxCanvasHeight || !maxCanvasArea) {
+            return undefined;
+        }
+
+        const nbPixels = width * height;
+        const ratioHeight = maxCanvasHeight / height;
+        const ratioWidth = maxCanvasWidth / width;
+        const ratioArea = Math.sqrt(maxCanvasArea / nbPixels);
+        const ratio = Math.min(ratioHeight, ratioArea, ratioWidth);
+
+        if (ratio > window.devicePixelRatio) {
+            return undefined;
+        }
+
+        return ratio;
+    };
 
     /**
      * Calculates a proper page width.
@@ -138,6 +141,9 @@ function PDFPreviewer({pageMaxWidth, isSmallScreen, file, containerStyle, conten
         },
         [pageViewports, calculatePageWidth],
     );
+
+    const estimatedPageHeight = calculatePageHeight(0);
+    const pageWidth = calculatePageWidth();
 
     /**
      * Upon successful document load, combine an array of page viewports,
@@ -192,29 +198,29 @@ function PDFPreviewer({pageMaxWidth, isSmallScreen, file, containerStyle, conten
     };
 
     /**
-     * Render a specific page based on its index.
-     * The method includes a wrapper to apply virtualized styles.
+     * Render a form to handle password typing.
+     * The method renders the passed or default component.
      */
-    const renderPage = useCallback(
-        // eslint-disable-next-line react/no-unused-prop-types
-        ({index, style}: {index: number; style: object}) => {
-            const pageWidth = calculatePageWidth();
+    const internalRenderPasswordForm = useCallback(() => {
+        const onSubmit = attemptPDFLoad;
+        const onPasswordChange = () => setIsPasswordInvalid(false);
 
-            return (
-                <div style={style}>
-                    <Page
-                        key={`page_${index}`}
-                        width={pageWidth}
-                        pageIndex={index}
-                        // This needs to be empty to avoid multiple loading texts which show per page and look ugly
-                        // See https://github.com/Expensify/App/issues/14358 for more details
-                        loading=""
-                    />
-                </div>
-            );
-        },
-        [calculatePageWidth],
-    );
+        if (typeof renderPasswordForm === 'function') {
+            return renderPasswordForm({
+                isPasswordInvalid,
+                onSubmit,
+                onPasswordChange,
+            });
+        }
+
+        return (
+            <PDFPasswordForm
+                isPasswordInvalid={isPasswordInvalid}
+                onSubmit={onSubmit}
+                onPasswordChange={onPasswordChange}
+            />
+        );
+    }, [isPasswordInvalid, attemptPDFLoad, setIsPasswordInvalid, renderPasswordForm]);
 
     useLayoutEffect(() => {
         setContainerWidth(containerRef.current?.clientWidth ?? 0);
@@ -226,42 +232,39 @@ function PDFPreviewer({pageMaxWidth, isSmallScreen, file, containerStyle, conten
             ref={containerRef}
             style={{...styles.container, ...containerStyle}}
         >
-            <Document
-                file={file}
-                options={DEFAULT_DOCUMENT_OPTIONS}
-                externalLinkTarget={DEFAULT_EXTERNAL_LINK_TARGET}
-                error={<p>Failed to load the PDF file :(</p>}
-                loading={<p>Loading...</p>}
-                onLoadSuccess={onDocumentLoadSuccess}
-                onPassword={initiatePasswordChallenge}
-            >
-                {pageViewports.length > 0 && (
-                    <List
-                        style={{...styles.list, ...contentContainerStyle}}
-                        outerRef={setListAttributes}
-                        width={containerWidth}
-                        height={containerHeight}
-                        itemCount={numPages}
-                        itemSize={calculatePageHeight}
-                        estimatedItemSize={calculatePageHeight(0)}
-                    >
-                        {renderPage}
-                    </List>
-                )}
-            </Document>
+            <div style={{...styles.innerContainer, ...(shouldRequestPassword ? styles.invisibleContainer : {})}}>
+                <Document
+                    file={file}
+                    options={DEFAULT_DOCUMENT_OPTIONS}
+                    externalLinkTarget={DEFAULT_EXTERNAL_LINK_TARGET}
+                    error={ErrorComponent}
+                    loading={LoadingComponent}
+                    onLoadSuccess={onDocumentLoadSuccess}
+                    onPassword={initiatePasswordChallenge}
+                >
+                    {pageViewports.length > 0 && (
+                        <List
+                            style={{...styles.list, ...contentContainerStyle}}
+                            outerRef={setListAttributes}
+                            width={isSmallScreen ? pageWidth : containerWidth}
+                            height={containerHeight}
+                            itemCount={numPages}
+                            itemSize={calculatePageHeight}
+                            estimatedItemSize={calculatePageHeight(0)}
+                            itemData={{pageWidth, estimatedPageHeight, calculatePageHeight, getDevicePixelRatio}}
+                        >
+                            {PageRenderer}
+                        </List>
+                    )}
+                </Document>
+            </div>
 
-            {shouldRequestPassword && (
-                <PDFPasswordForm
-                    isFocused
-                    isPasswordInvalid={isPasswordInvalid}
-                    onSubmit={attemptPDFLoad}
-                    onPasswordChange={() => setIsPasswordInvalid(false)}
-                />
-            )}
+            {shouldRequestPassword && internalRenderPasswordForm()}
         </div>
     );
 }
 
+PDFPasswordForm.displayName = 'PDFPreviewer';
 PDFPreviewer.propTypes = propTypes;
 PDFPreviewer.defaultProps = defaultProps;
 

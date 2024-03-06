@@ -39,4 +39,25 @@ const isMobileSafari = (): boolean => {
 
 const isSafari = () => getBrowser() === 'safari' || isMobileSafari();
 
-export {getBrowser, isMobileSafari, isSafari};
+type ListRef = {
+    tabIndex: number;
+};
+
+/**
+ * Sets attributes to list container.
+ * It unblocks a default scroll by keyboard of browsers.
+ */
+const setListAttributes = (ref: ListRef | undefined) => {
+    if (!ref) {
+        return;
+    }
+
+    /**
+     *  Useful for elements that should not be navigated to directly using the "Tab" key,
+     * but need to have keyboard focus set to them.
+     */
+    // eslint-disable-next-line no-param-reassign
+    ref.tabIndex = -1;
+};
+
+export {getBrowser, isMobileSafari, isSafari, setListAttributes};

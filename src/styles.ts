@@ -4,12 +4,26 @@ const pdfPreviewerStyles: ComponentStyles = {
     container: {
         width: '100%',
         height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    innerContainer: {
+        width: '100%',
+        height: '100%',
         /**
          * It's being used on Web/Desktop only to vertically center short PDFs,
          * while preventing the overflow of the top of long PDF files.
          */
         display: 'grid',
-        position: 'relative',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+    },
+    invisibleContainer: {
+        position: 'absolute',
+        opacity: 0,
+        zIndex: -1,
     },
     list: {
         overflowX: 'hidden',
@@ -17,6 +31,9 @@ const pdfPreviewerStyles: ComponentStyles = {
         boxShadow: 'none',
         outline: 'none',
     } as const,
+    pageWrapper: {
+        display: 'flex',
+    },
 };
 
 const pdfPasswordFormStyles: ComponentStyles = {
@@ -25,12 +42,6 @@ const pdfPasswordFormStyles: ComponentStyles = {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        position: 'absolute',
-        zIndex: 1,
-        bottom: 0,
-        right: 0,
-        left: 0,
-        top: 0,
         backgroundColor: '#07271f',
     },
     infoMessage: {

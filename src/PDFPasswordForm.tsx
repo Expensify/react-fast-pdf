@@ -6,7 +6,6 @@ import {isSafari} from './helpers';
 
 type Props = {
     isPasswordInvalid?: boolean;
-    isFocused: boolean;
     onSubmit?: (password: string) => void;
     onPasswordChange?: (password: string) => void;
     onPasswordFieldFocus?: (isFocused: boolean) => void;
@@ -15,9 +14,6 @@ type Props = {
 const propTypes = {
     /** If the submitted password is invalid (show an error message) */
     isPasswordInvalid: PropTypes.bool,
-
-    /** Should focus to the password input  */
-    isFocused: PropTypes.bool.isRequired,
 
     /** Notify parent that the password form has been submitted */
     onSubmit: PropTypes.func,
@@ -36,7 +32,7 @@ const defaultProps = {
     onPasswordFieldFocus: () => {},
 };
 
-function PDFPasswordForm({isPasswordInvalid, isFocused, onSubmit, onPasswordChange, onPasswordFieldFocus}: Props) {
+function PDFPasswordForm({isPasswordInvalid, onSubmit, onPasswordChange, onPasswordFieldFocus}: Props) {
     const [password, setPassword] = useState('');
     const [validationErrorText, setValidationErrorText] = useState('');
     const [shouldShowForm, setShouldShowForm] = useState(false);
@@ -135,7 +131,7 @@ function PDFPasswordForm({isPasswordInvalid, isFocused, onSubmit, onPasswordChan
                          */
                         autoComplete={isSafari() ? 'username' : 'off'}
                         // eslint-disable-next-line jsx-a11y/no-autofocus
-                        autoFocus={isFocused}
+                        autoFocus
                         type="password"
                         onFocus={() => onPasswordFieldFocus?.(true)}
                         onBlur={validateAndNotifyPasswordBlur}
@@ -159,4 +155,5 @@ PDFPasswordForm.propTypes = propTypes;
 PDFPasswordForm.defaultProps = defaultProps;
 PDFPasswordForm.displayName = 'PDFPasswordForm';
 
+export type {Props as PDFPasswordFormProps};
 export default PDFPasswordForm;
