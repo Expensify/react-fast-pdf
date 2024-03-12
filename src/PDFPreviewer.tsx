@@ -1,3 +1,6 @@
+// @ts-expect-error - This line imports a module from 'pdfjs-dist' package which lacks TypeScript typings.
+// eslint-disable-next-line import/no-extraneous-dependencies
+import pdfWorkerSource from 'pdfjs-dist/legacy/build/pdf.worker';
 import React, {memo, useCallback, useLayoutEffect, useRef, useState} from 'react';
 import type {CSSProperties, ReactNode} from 'react';
 import times from 'lodash/times';
@@ -57,8 +60,7 @@ const defaultProps = {
     contentContainerStyle: {},
 };
 
-// @ts-expect-error - It is a recommended step for import worker - https://github.com/wojtekmaj/react-pdf/blob/main/packages/react-pdf/README.md#import-worker-recommended
-pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString();
+pdfjs.GlobalWorkerOptions.workerSrc = URL.createObjectURL(new Blob([pdfWorkerSource], {type: 'text/javascript'}));
 
 function PDFPreviewer({
     file,

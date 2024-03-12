@@ -53,6 +53,20 @@ function App() {
                         >
                             example_protected.pdf (Password: 123456)
                         </button>
+
+                        <input
+                            className="button"
+                            type="file"
+                            onChange={(event) => {
+                                const uploadedFile = event?.target?.files?.[0];
+
+                                if (!uploadedFile) {
+                                    return;
+                                }
+
+                                setFile(URL.createObjectURL(uploadedFile));
+                            }}
+                        />
                     </div>
                 </>
             )}
