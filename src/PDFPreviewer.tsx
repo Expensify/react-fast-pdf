@@ -251,7 +251,7 @@ function PDFPreviewer({
                             itemCount={numPages}
                             itemSize={calculatePageHeight}
                             estimatedItemSize={calculatePageHeight(0)}
-                            itemData={{pageWidth, estimatedPageHeight, calculatePageHeight, getDevicePixelRatio}}
+                            itemData={{pageWidth, estimatedPageHeight, calculatePageHeight, getDevicePixelRatio, containerHeight, numPages}}
                         >
                             {PageRenderer}
                         </List>
