@@ -27,6 +27,8 @@ type Props = {
     renderPasswordForm?: ({isPasswordInvalid, onSubmit, onPasswordChange}: Omit<PDFPasswordFormProps, 'onPasswordFieldFocus'>) => ReactNode | null;
     LoadingComponent?: ReactNode;
     ErrorComponent?: ReactNode;
+    shouldShowErrorComponent?: boolean;
+    onLoadError?: () => void;
     containerStyle?: CSSProperties;
     contentContainerStyle?: CSSProperties;
 };
@@ -43,6 +45,8 @@ const propTypes = {
     renderPasswordForm: PropTypes.func,
     LoadingComponent: PropTypes.node,
     ErrorComponent: PropTypes.node,
+    shouldShowErrorComponent: PropTypes.bool,
+    onLoadError: PropTypes.func,
     // eslint-disable-next-line react/forbid-prop-types
     containerStyle: PropTypes.object,
     // eslint-disable-next-line react/forbid-prop-types
@@ -56,8 +60,10 @@ const defaultProps = {
     renderPasswordForm: null,
     LoadingComponent: <p>Loading...</p>,
     ErrorComponent: <p>Failed to load the PDF file :(</p>,
+    shouldShowErrorComponent: true,
     containerStyle: {},
     contentContainerStyle: {},
+    onLoadError: () => {},
 };
 
 pdfjs.GlobalWorkerOptions.workerSrc = URL.createObjectURL(new Blob([pdfWorkerSource], {type: 'text/javascript'}));
@@ -74,6 +80,8 @@ function PDFPreviewer({
     renderPasswordForm,
     containerStyle,
     contentContainerStyle,
+    shouldShowErrorComponent,
+    onLoadError,
 }: Props) {
     const [pageViewports, setPageViewports] = useState<PageViewport[]>([]);
     const [numPages, setNumPages] = useState(0);
@@ -237,7 +245,8 @@ function PDFPreviewer({
                     file={file}
                     options={DEFAULT_DOCUMENT_OPTIONS}
                     externalLinkTarget={DEFAULT_EXTERNAL_LINK_TARGET}
-                    error={ErrorComponent}
+                    error={shouldShowErrorComponent ? ErrorComponent : null}
+                    onLoadError={onLoadError}
                     loading={LoadingComponent}
                     onLoadSuccess={onDocumentLoadSuccess}
                     onPassword={initiatePasswordChallenge}
