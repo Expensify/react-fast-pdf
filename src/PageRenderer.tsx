@@ -12,6 +12,8 @@ type Props = {
         estimatedPageHeight: number;
         calculatePageHeight: (pageIndex: number) => number;
         getDevicePixelRatio: (width: number, height: number) => number | undefined;
+        numPages: number;
+        containerHeight: number;
     };
 };
 
@@ -29,6 +31,10 @@ const propTypes = {
         calculatePageHeight: PropTypes.func.isRequired,
         /** Function that calculates the pixel ratio for a page given its calculated width and height */
         getDevicePixelRatio: PropTypes.func.isRequired,
+        /** The number of pages in the document */
+        numPages: PropTypes.number.isRequired,
+        /** The height of the container view */
+        containerHeight: PropTypes.number.isRequired,
     }).isRequired,
 
     /** Additional style props passed by VariableSizeList */
@@ -37,16 +43,16 @@ const propTypes = {
 };
 
 function PageRenderer({index, style, data}: Props) {
-    const {pageWidth, estimatedPageHeight, calculatePageHeight, getDevicePixelRatio} = data;
+    const {pageWidth, estimatedPageHeight, calculatePageHeight, getDevicePixelRatio, numPages, containerHeight} = data;
     /**
      * Render a specific page based on its index.
      * The method includes a wrapper to apply virtualized styles.
      */
     const pageHeight = calculatePageHeight(index);
     const devicePixelRatio = getDevicePixelRatio(pageWidth, pageHeight);
-
+    const topPadding = numPages > 1 ? parseFloat(style.top as unknown as string) + PAGE_BORDER : containerHeight - parseFloat(style.height as unknown as string) / 2;
     return (
-        <div style={{...styles.pageWrapper, ...style, top: `${parseFloat(style.top as unknown as string) + PAGE_BORDER}px`}}>
+        <div style={{...styles.pageWrapper, ...style, top: `${topPadding}px`}}>
             <Page
                 key={`page_${index}`}
                 width={pageWidth}
