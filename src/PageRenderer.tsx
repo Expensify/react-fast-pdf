@@ -50,7 +50,7 @@ function PageRenderer({index, style, data}: Props) {
      */
     const pageHeight = calculatePageHeight(index);
     const devicePixelRatio = getDevicePixelRatio(pageWidth, pageHeight);
-    const topPadding = numPages > 1 ? parseFloat(style.top as unknown as string) + PAGE_BORDER : containerHeight - parseFloat(style.height as unknown as string) / 2;
+    const topPadding = numPages > 1 ? parseFloat(style.top as unknown as string) + PAGE_BORDER : (containerHeight - parseFloat(style.height as unknown as string)) / 2;
     return (
         <div style={{...styles.pageWrapper, ...style, top: `${topPadding}px`}}>
             <Page
