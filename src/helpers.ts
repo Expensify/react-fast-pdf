@@ -41,7 +41,6 @@ const isSafari = () => getBrowser() === 'safari' || isMobileSafari();
 
 type ListRef = {
     tabIndex: number;
-    focus: () => void;
 };
 
 /**
@@ -59,7 +58,6 @@ const setListAttributes = (ref: ListRef | undefined) => {
      */
     // eslint-disable-next-line no-param-reassign
     ref.tabIndex = -1;
-    ref.focus();
 };
 
 export {getBrowser, isMobileSafari, isSafari, setListAttributes};
