@@ -231,8 +231,19 @@ function PDFPreviewer({
     }, [isPasswordInvalid, attemptPDFLoad, setIsPasswordInvalid, renderPasswordForm]);
 
     useLayoutEffect(() => {
-        setContainerWidth(containerRef.current?.clientWidth ?? 0);
-        setContainerHeight(containerRef.current?.clientHeight ?? 0);
+        if (!containerRef.current) {
+            return;
+        }
+        const resizeObserver = new ResizeObserver(() => {
+            if (!containerRef.current) {
+                return;
+            }
+            setContainerWidth(containerRef.current.clientWidth);
+            setContainerHeight(containerRef.current.clientHeight);
+        });
+        resizeObserver.observe(containerRef.current);
+
+        return resizeObserver.disconnect;
     }, []);
 
     return (
