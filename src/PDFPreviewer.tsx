@@ -232,7 +232,7 @@ function PDFPreviewer({
 
     useLayoutEffect(() => {
         if (!containerRef.current) {
-            return;
+            return undefined;
         }
         const resizeObserver = new ResizeObserver(() => {
             if (!containerRef.current) {
@@ -243,7 +243,7 @@ function PDFPreviewer({
         });
         resizeObserver.observe(containerRef.current);
 
-        return resizeObserver.disconnect;
+        return () => resizeObserver.disconnect();
     }, []);
 
     return (
