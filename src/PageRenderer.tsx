@@ -1,5 +1,4 @@
 import React, {memo, type CSSProperties} from 'react';
-import PropTypes from 'prop-types';
 import {Page} from 'react-pdf';
 import {pdfPreviewerStyles as styles} from './styles';
 import {PAGE_BORDER} from './constants';
@@ -15,31 +14,6 @@ type Props = {
         numPages: number;
         containerHeight: number;
     };
-};
-
-const propTypes = {
-    /** Index of the PDF page to be displayed passed by VariableSizeList */
-    index: PropTypes.number.isRequired,
-
-    /** Page extra data passed by VariableSizeList's data prop */
-    data: PropTypes.shape({
-        /** Width of a single page in the document */
-        pageWidth: PropTypes.number.isRequired,
-        /** The estimated height of a single page in the document */
-        estimatedPageHeight: PropTypes.number.isRequired,
-        /** Function that calculates the height of a page given its index */
-        calculatePageHeight: PropTypes.func.isRequired,
-        /** Function that calculates the pixel ratio for a page given its calculated width and height */
-        getDevicePixelRatio: PropTypes.func.isRequired,
-        /** The number of pages in the document */
-        numPages: PropTypes.number.isRequired,
-        /** The height of the container view */
-        containerHeight: PropTypes.number.isRequired,
-    }).isRequired,
-
-    /** Additional style props passed by VariableSizeList */
-    // eslint-disable-next-line react/forbid-prop-types
-    style: PropTypes.object.isRequired,
 };
 
 function PageRenderer({index, style, data}: Props) {
@@ -70,6 +44,5 @@ function PageRenderer({index, style, data}: Props) {
 }
 
 PageRenderer.displayName = 'PageRenderer';
-PageRenderer.propTypes = propTypes;
 
 export default memo(PageRenderer);

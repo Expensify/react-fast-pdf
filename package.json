@@ -34,7 +34,6 @@
   },
   "peerDependencies": {
     "lodash": "4.x",
-    "prop-types": "15.x",
     "pdfjs-dist": "4.x",
     "react": "18.x",
     "react-dom": "18.x"

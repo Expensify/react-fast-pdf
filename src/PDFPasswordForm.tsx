@@ -1,5 +1,4 @@
 import React, {useState, useRef, useMemo, type ChangeEvent, type FormEventHandler} from 'react';
-import PropTypes from 'prop-types';
 
 import {pdfPasswordFormStyles as styles} from './styles';
 import {isSafari} from './helpers';
@@ -9,27 +8,6 @@ type Props = {
     onSubmit?: (password: string) => void;
     onPasswordChange?: (password: string) => void;
     onPasswordFieldFocus?: (isFocused: boolean) => void;
-};
-
-const propTypes = {
-    /** If the submitted password is invalid (show an error message) */
-    isPasswordInvalid: PropTypes.bool,
-
-    /** Notify parent that the password form has been submitted */
-    onSubmit: PropTypes.func,
-
-    /** Notify parent that the password has been updated/edited */
-    onPasswordChange: PropTypes.func,
-
-    /** Notify parent that a text field has been focused or blurred */
-    onPasswordFieldFocus: PropTypes.func,
-};
-
-const defaultProps = {
-    isPasswordInvalid: false,
-    onSubmit: () => {},
-    onPasswordChange: () => {},
-    onPasswordFieldFocus: () => {},
 };
 
 function PDFPasswordForm({isPasswordInvalid, onSubmit, onPasswordChange, onPasswordFieldFocus}: Props) {
@@ -151,8 +129,6 @@ function PDFPasswordForm({isPasswordInvalid, onSubmit, onPasswordChange, onPassw
     );
 }
 
-PDFPasswordForm.propTypes = propTypes;
-PDFPasswordForm.defaultProps = defaultProps;
 PDFPasswordForm.displayName = 'PDFPasswordForm';
 
 export type {Props as PDFPasswordFormProps};
