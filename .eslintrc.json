@@ -22,6 +22,7 @@
             }
         ],
         "no-invalid-this": "error",
+        "react/require-default-props": "off",
         "react/function-component-definition": [
             "error",
             {

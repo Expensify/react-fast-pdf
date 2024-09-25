@@ -1,10 +1,9 @@
 // @ts-expect-error - This line imports a module from 'pdfjs-dist' package which lacks TypeScript typings.
-// eslint-disable-next-line import/no-extraneous-dependencies
-import pdfWorkerSource from 'pdfjs-dist/legacy/build/pdf.worker';
+// eslint-disable-next-line import/extensions
+import pdfWorkerSource from 'pdfjs-dist/legacy/build/pdf.worker.mjs';
 import React, {memo, useCallback, useLayoutEffect, useRef, useState} from 'react';
 import type {CSSProperties, ReactNode} from 'react';
 import times from 'lodash/times';
-import PropTypes from 'prop-types';
 import {VariableSizeList as List} from 'react-window';
 import {Document, pdfjs} from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
@@ -21,9 +20,9 @@ type Props = {
     file: string;
     pageMaxWidth: number;
     isSmallScreen: boolean;
-    maxCanvasWidth: number | null;
-    maxCanvasHeight: number | null;
-    maxCanvasArea: number | null;
+    maxCanvasWidth?: number;
+    maxCanvasHeight?: number;
+    maxCanvasArea?: number;
     renderPasswordForm?: ({isPasswordInvalid, onSubmit, onPasswordChange}: Omit<PDFPasswordFormProps, 'onPasswordFieldFocus'>) => ReactNode | null;
     LoadingComponent?: ReactNode;
     ErrorComponent?: ReactNode;
@@ -35,38 +34,10 @@ type Props = {
 
 type OnPasswordCallback = (password: string | null) => void;
 
-const propTypes = {
-    file: PropTypes.string.isRequired,
-    pageMaxWidth: PropTypes.number.isRequired,
-    isSmallScreen: PropTypes.bool.isRequired,
-    maxCanvasWidth: PropTypes.number,
-    maxCanvasHeight: PropTypes.number,
-    maxCanvasArea: PropTypes.number,
-    renderPasswordForm: PropTypes.func,
-    LoadingComponent: PropTypes.node,
-    ErrorComponent: PropTypes.node,
-    shouldShowErrorComponent: PropTypes.bool,
-    onLoadError: PropTypes.func,
-    // eslint-disable-next-line react/forbid-prop-types
-    containerStyle: PropTypes.object,
-    // eslint-disable-next-line react/forbid-prop-types
-    contentContainerStyle: PropTypes.object,
-};
-
-const defaultProps = {
-    maxCanvasWidth: null,
-    maxCanvasHeight: null,
-    maxCanvasArea: null,
-    renderPasswordForm: null,
-    LoadingComponent: <p>Loading...</p>,
-    ErrorComponent: <p>Failed to load the PDF file :(</p>,
-    shouldShowErrorComponent: true,
-    containerStyle: {},
-    contentContainerStyle: {},
-    onLoadError: () => {},
-};
-
 pdfjs.GlobalWorkerOptions.workerSrc = URL.createObjectURL(new Blob([pdfWorkerSource], {type: 'text/javascript'}));
+
+const DefaultLoadingComponent = <p>Loading...</p>;
+const DefaultErrorComponent = <p>Failed to load the PDF file :(</p>;
 
 function PDFPreviewer({
     file,
@@ -75,12 +46,12 @@ function PDFPreviewer({
     maxCanvasWidth,
     maxCanvasHeight,
     maxCanvasArea,
-    LoadingComponent,
-    ErrorComponent,
+    LoadingComponent = DefaultLoadingComponent,
+    ErrorComponent = DefaultErrorComponent,
     renderPasswordForm,
     containerStyle,
     contentContainerStyle,
-    shouldShowErrorComponent,
+    shouldShowErrorComponent = true,
     onLoadError,
 }: Props) {
     const [pageViewports, setPageViewports] = useState<PageViewport[]>([]);
@@ -285,7 +256,5 @@ function PDFPreviewer({
 }
 
 PDFPasswordForm.displayName = 'PDFPreviewer';
-PDFPreviewer.propTypes = propTypes;
-PDFPreviewer.defaultProps = defaultProps;
 
 export default memo(PDFPreviewer);
