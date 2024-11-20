@@ -46,7 +46,7 @@ module.exports = {
             // This causes issues if we have gone offline before the pdfjs web worker is set up as we won't be able to load it from the server.
             {
                 // eslint-disable-next-line prefer-regex-literals
-                test: new RegExp('node_modules/pdfjs-dist/legacy/build/pdf.worker.js'),
+                test: new RegExp('node_modules/pdfjs-dist/legacy/build/pdf.worker.min.mjs'),
                 type: 'asset/source',
             },
         ],
