@@ -1,6 +1,6 @@
 // @ts-expect-error - This line imports a module from 'pdfjs-dist' package which lacks TypeScript typings.
 // eslint-disable-next-line import/extensions
-import pdfWorkerSource from 'pdfjs-dist/legacy/build/pdf.worker.min.mjs';
+import pdfWorkerSource from 'pdfjs-dist/build/pdf.worker.min.mjs';
 import React, {memo, useCallback, useLayoutEffect, useRef, useState} from 'react';
 import type {CSSProperties, ReactNode} from 'react';
 import times from 'lodash/times';
