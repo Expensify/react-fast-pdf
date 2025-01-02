@@ -60,6 +60,7 @@ function PDFPreviewer({
     const [containerHeight, setContainerHeight] = useState(0);
     const [shouldRequestPassword, setShouldRequestPassword] = useState(false);
     const [isPasswordInvalid, setIsPasswordInvalid] = useState(false);
+    const [initialContainerWidth, setInitialContainerWidth] = useState(0);
     const containerRef = useRef<HTMLDivElement>(null);
     const onPasswordCallbackRef = useRef<OnPasswordCallback | null>(null);
 
@@ -94,11 +95,12 @@ function PDFPreviewer({
      * It depends on a screen size. Also, the app should take into account the page borders.
      */
     const calculatePageWidth = useCallback(() => {
-        const pageWidthOnLargeScreen = Math.min(containerWidth - LARGE_SCREEN_SIDE_SPACING * 2, pageMaxWidth);
-        const pageWidth = isSmallScreen ? containerWidth : pageWidthOnLargeScreen;
+        const effectiveWidth = initialContainerWidth || containerWidth;
+        const pageWidthOnLargeScreen = Math.min(effectiveWidth - LARGE_SCREEN_SIDE_SPACING * 2, pageMaxWidth);
+        const pageWidth = isSmallScreen ? effectiveWidth : pageWidthOnLargeScreen;
 
         return pageWidth + PAGE_BORDER * 2;
-    }, [containerWidth, pageMaxWidth, isSmallScreen]);
+    }, [initialContainerWidth, containerWidth, pageMaxWidth, isSmallScreen]);
 
     /**
      * Calculates a proper page height. The method should be called only when there are page viewports.
@@ -209,20 +211,34 @@ function PDFPreviewer({
             if (!containerRef.current) {
                 return;
             }
-            setContainerWidth(containerRef.current.clientWidth);
+            const currentWidth = containerRef.current.clientWidth;
+            setContainerWidth(currentWidth);
             setContainerHeight(containerRef.current.clientHeight);
+            
+            // Set initial width only once
+            if (!initialContainerWidth) {
+                setInitialContainerWidth(currentWidth);
+            }
         });
         resizeObserver.observe(containerRef.current);
 
         return () => resizeObserver.disconnect();
-    }, []);
+    }, [initialContainerWidth]);
 
     return (
         <div
             ref={containerRef}
-            style={{...styles.container, ...containerStyle}}
+            style={{
+                ...styles.container,
+                maxWidth: '100%', // Add this to prevent growing beyond container
+                ...containerStyle
+            }}
         >
-            <div style={{...styles.innerContainer, ...(shouldRequestPassword ? styles.invisibleContainer : {})}}>
+            <div style={{
+                ...styles.innerContainer,
+                ...(shouldRequestPassword ? styles.invisibleContainer : {}),
+                maxWidth: '100%' // Add this to prevent growing beyond container
+            }}>
                 <Document
                     file={file}
                     options={DEFAULT_DOCUMENT_OPTIONS}
@@ -235,9 +251,13 @@ function PDFPreviewer({
                 >
                     {pageViewports.length > 0 && (
                         <List
-                            style={{...styles.list, ...contentContainerStyle}}
+                            style={{
+                                ...styles.list,
+                                maxWidth: '100%', // Add this to prevent growing beyond container
+                                ...contentContainerStyle
+                            }}
                             outerRef={setListAttributes}
-                            width={isSmallScreen ? pageWidth : containerWidth}
+                            width={calculatePageWidth()}
                             height={containerHeight}
                             itemCount={numPages}
                             itemSize={calculatePageHeight}

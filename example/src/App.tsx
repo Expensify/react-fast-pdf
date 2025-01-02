@@ -12,6 +12,7 @@ const pdfPreviewerContainerStyle: CSSProperties = {
 function App() {
     const [file, setFile] = useState<string | null>(null);
 
+
     return (
         <main className="container">
             <h1 className="title">Hello, I am {ReactFastPDF.PackageName}!</h1>

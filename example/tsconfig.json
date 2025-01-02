@@ -4,7 +4,7 @@
         "target": "es2016" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
         "jsx": "react" /* Specify what JSX code is generated. */,
         "module": "commonjs" /* Specify what module code is generated. */,
-        "rootDir": "./src" /* Specify the root folder within your source files. */,
+        "rootDir": "../" /* Specify the root folder within your source files. */,
         "declaration": true /* Generate .d.ts files from TypeScript and JavaScript files in your project. */,
         "declarationMap": true /* Create sourcemaps for d.ts files. */,
         "outDir": "./dist" /* Specify an output folder for all emitted files. */,
