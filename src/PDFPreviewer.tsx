@@ -257,7 +257,7 @@ function PDFPreviewer({
                                 ...contentContainerStyle
                             }}
                             outerRef={setListAttributes}
-                            width={calculatePageWidth()}
+                            width={pageWidth}
                             height={containerHeight}
                             itemCount={numPages}
                             itemSize={calculatePageHeight}
