@@ -230,14 +230,14 @@ function PDFPreviewer({
             ref={containerRef}
             style={{
                 ...styles.container,
-                maxWidth: '100%', // Add this to prevent growing beyond container
+                maxWidth: '100%', 
                 ...containerStyle
             }}
         >
             <div style={{
                 ...styles.innerContainer,
                 ...(shouldRequestPassword ? styles.invisibleContainer : {}),
-                maxWidth: '100%' // Add this to prevent growing beyond container
+                maxWidth: '100%' 
             }}>
                 <Document
                     file={file}
@@ -253,7 +253,7 @@ function PDFPreviewer({
                         <List
                             style={{
                                 ...styles.list,
-                                maxWidth: '100%', // Add this to prevent growing beyond container
+                                maxWidth: '100%', 
                                 ...contentContainerStyle
                             }}
                             outerRef={setListAttributes}
