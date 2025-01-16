@@ -30,7 +30,7 @@
   "homepage": "https://github.com/Expensify/react-fast-pdf#readme",
   "dependencies": {
     "react-pdf": "^9.2.1",
-    "react-window": "^1.8.10"
+    "react-window": "^1.8.11"
   },
   "peerDependencies": {
     "lodash": "4.x",
