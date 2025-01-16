@@ -1,13 +1,16 @@
-import React, {CSSProperties, useState} from 'react';
+import React, {
+    // CSSProperties,
+    useState,
+} from 'react';
 import ReactFastPDF, {PDFPreviewer} from 'react-fast-pdf';
 import './index.css';
 
-const pdfPreviewerContainerStyle: CSSProperties = {
-    borderRadius: 4,
-    borderWidth: 2,
-    borderColor: '#184E3D',
-    borderStyle: 'solid',
-};
+// const pdfPreviewerContainerStyle: CSSProperties = {
+//     borderRadius: 4,
+//     borderWidth: 2,
+//     borderColor: '#184E3D',
+//     borderStyle: 'solid',
+// };
 
 function App() {
     const [file, setFile] = useState<string | null>(null);
@@ -30,7 +33,7 @@ function App() {
                         file={file}
                         pageMaxWidth={1000}
                         isSmallScreen={false}
-                        containerStyle={pdfPreviewerContainerStyle}
+                        // containerStyle={pdfPreviewerContainerStyle}
                     />
                 </>
             ) : (
