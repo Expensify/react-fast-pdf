@@ -34,7 +34,7 @@
   },
   "peerDependencies": {
     "lodash": "4.x",
-    "pdfjs-dist": "4.x",
+    "pdfjs-dist": "4.8.69",
     "react": "18.x",
     "react-dom": "18.x"
   },
