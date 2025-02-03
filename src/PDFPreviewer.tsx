@@ -36,14 +36,10 @@ type Props = {
 type OnPasswordCallback = (password: string | null) => void;
 
 const shouldUseLegacyWorker = isMobileSafari() && !isModernSafari();
-const pdfWorker: unknown = shouldUseLegacyWorker ? pdfWorkerLegacySource : pdfWorkerSource;
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+const pdfWorker = shouldUseLegacyWorker ? pdfWorkerLegacySource : pdfWorkerSource;
 
-console.log('[dev] isMobileSafari', isMobileSafari());
-console.log('[dev] isModernSafari', isModernSafari());
-console.log('[dev] shouldUseLegacyWorker', shouldUseLegacyWorker);
-console.log('[dev] pdfWorker', pdfWorker);
-
-pdfjs.GlobalWorkerOptions.workerSrc = URL.createObjectURL(new Blob([pdfWorkerLegacySource], {type: 'text/javascript'}));
+pdfjs.GlobalWorkerOptions.workerSrc = URL.createObjectURL(new Blob([pdfWorker], {type: 'text/javascript'}));
 
 const DefaultLoadingComponent = <p>Loading...</p>;
 const DefaultErrorComponent = <p>Failed to load the PDF file :(</p>;
