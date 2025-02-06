@@ -1,6 +1,7 @@
-// @ts-expect-error - This line imports a module from 'pdfjs-dist' package which lacks TypeScript typings.
 // eslint-disable-next-line import/extensions
-import pdfWorkerSource from 'pdfjs-dist/legacy/build/pdf.worker.mjs';
+import pdfWorkerSource from 'pdfjs-dist/build/pdf.worker.min.mjs';
+// eslint-disable-next-line import/extensions
+import pdfWorkerLegacySource from 'pdfjs-dist/legacy/build/pdf.worker.mjs';
 import React, {memo, useCallback, useLayoutEffect, useRef, useState} from 'react';
 import type {CSSProperties, ReactNode} from 'react';
 import times from 'lodash/times';
@@ -14,7 +15,7 @@ import {pdfPreviewerStyles as styles} from './styles';
 import PDFPasswordForm, {type PDFPasswordFormProps} from './PDFPasswordForm';
 import PageRenderer from './PageRenderer';
 import {PAGE_BORDER, LARGE_SCREEN_SIDE_SPACING, DEFAULT_DOCUMENT_OPTIONS, DEFAULT_EXTERNAL_LINK_TARGET, PDF_PASSWORD_FORM_RESPONSES} from './constants';
-import {setListAttributes} from './helpers';
+import {isMobileSafari, isModernSafari, setListAttributes} from './helpers';
 
 type Props = {
     file: string;
@@ -34,7 +35,11 @@ type Props = {
 
 type OnPasswordCallback = (password: string | null) => void;
 
-pdfjs.GlobalWorkerOptions.workerSrc = URL.createObjectURL(new Blob([pdfWorkerSource], {type: 'text/javascript'}));
+const shouldUseLegacyWorker = isMobileSafari() && !isModernSafari();
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+const pdfWorker = shouldUseLegacyWorker ? pdfWorkerLegacySource : pdfWorkerSource;
+
+pdfjs.GlobalWorkerOptions.workerSrc = URL.createObjectURL(new Blob([pdfWorker], {type: 'text/javascript'}));
 
 const DefaultLoadingComponent = <p>Loading...</p>;
 const DefaultErrorComponent = <p>Failed to load the PDF file :(</p>;

@@ -39,6 +39,13 @@ const isMobileSafari = (): boolean => {
 
 const isSafari = () => getBrowser() === 'safari' || isMobileSafari();
 
+const isModernSafari = (): boolean => {
+    const version = navigator.userAgent.match(/OS (\d+_\d+)/);
+    const iosVersion = version ? version[1].replace('_', '.') : '';
+
+    return parseFloat(iosVersion) >= 18;
+};
+
 type ListRef = {
     tabIndex: number;
 };
@@ -60,4 +67,4 @@ const setListAttributes = (ref: ListRef | undefined) => {
     ref.tabIndex = -1;
 };
 
-export {getBrowser, isMobileSafari, isSafari, setListAttributes};
+export {getBrowser, isMobileSafari, isSafari, isModernSafari, setListAttributes};
