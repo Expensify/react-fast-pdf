@@ -67,11 +67,12 @@ function PDFPreviewer({
     const [isPasswordInvalid, setIsPasswordInvalid] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
     const onPasswordCallbackRef = useRef<OnPasswordCallback | null>(null);
+    const listRef = useRef<List>(null);
 
     /**
      * Calculate the devicePixelRatio the page should be rendered with
      * Each platform has a different default devicePixelRatio and different canvas limits, we need to verify that
-     * with the default devicePixelRatio it will be able to diplay the pdf correctly, if not we must change the devicePixelRatio.
+     * with the default devicePixelRatio it will be able to display the pdf correctly, if not we must change the devicePixelRatio.
      * @param {Number} width of the page
      * @param {Number} height of the page
      * @returns {Number} devicePixelRatio for this page on this platform
@@ -206,6 +207,15 @@ function PDFPreviewer({
         );
     }, [isPasswordInvalid, attemptPDFLoad, setIsPasswordInvalid, renderPasswordForm]);
 
+    /**
+     * Reset List style cache when dimensions change
+     */
+    useLayoutEffect(() => {
+        if (containerWidth > 0 && containerHeight > 0) {
+            listRef.current?.resetAfterIndex(0);
+        }
+    }, [containerWidth, containerHeight]);
+
     useLayoutEffect(() => {
         if (!containerRef.current) {
             return undefined;
@@ -240,6 +250,7 @@ function PDFPreviewer({
                 >
                     {pageViewports.length > 0 && (
                         <List
+                            ref={listRef}
                             style={{...styles.list, ...contentContainerStyle}}
                             outerRef={setListAttributes}
                             width={isSmallScreen ? pageWidth : containerWidth}
