@@ -8,3 +8,4 @@ dist/
 
 # NPM file created by GitHub actions
 .npmrc
+.idea/
