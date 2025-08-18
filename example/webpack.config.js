@@ -49,11 +49,6 @@ module.exports = {
                 test: new RegExp('node_modules/pdfjs-dist/build/pdf.worker.min.mjs'),
                 type: 'asset/source',
             },
-            {
-                // eslint-disable-next-line prefer-regex-literals
-                test: new RegExp('node_modules/pdfjs-dist/legacy/build/pdf.worker.min.mjs'),
-                type: 'asset/source',
-            },
         ],
     },
     plugins: [
