@@ -16,7 +16,7 @@ jobs:
               # v3
               uses: actions/setup-node@1a4442cacd436585916779262731d5b162bc6ec7
               with:
-                  node-version: 18
+                  node-version-file: '.nvmrc'
                   cache: npm
 
             - name: Install dependencies
