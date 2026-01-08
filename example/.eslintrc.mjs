@@ -1,4 +1,10 @@
-module.exports = {
+import path from 'path';
+import {fileURLToPath} from 'url';
+
+const filename = fileURLToPath(import.meta.url);
+const dirname = path.dirname(filename);
+
+export default {
     root: true,
     env: {
         browser: true,
@@ -9,7 +15,7 @@ module.exports = {
     parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module',
-        tsconfigRootDir: __dirname,
+        tsconfigRootDir: dirname,
     },
     extends: ['eslint:recommended', 'airbnb', 'plugin:@typescript-eslint/recommended', 'plugin:react/jsx-runtime', 'plugin:jsx-a11y/recommended', 'plugin:react/recommended', 'prettier'],
     plugins: ['@typescript-eslint', 'react', 'jsx-a11y'],
@@ -63,6 +69,12 @@ module.exports = {
             parser: '@typescript-eslint/parser',
             parserOptions: {
                 project: './tsconfig.json',
+            },
+        },
+        {
+            files: ['*'],
+            rules: {
+                'import/extensions': ['error', 'ignorePackages'],
             },
         },
     ],

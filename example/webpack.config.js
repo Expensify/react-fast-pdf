@@ -1,20 +1,26 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+import path from 'path';
+import {fileURLToPath} from 'url';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
 
-const cMapsDir = path.join(path.dirname(require.resolve('pdfjs-dist/package.json')), 'cmaps');
+const filename = fileURLToPath(import.meta.url);
+const dirname = path.dirname(filename);
 
-module.exports = {
-    entry: path.join(__dirname, 'src', 'index.js'),
+const pdfjsPkgUrl = import.meta.resolve('pdfjs-dist/package.json');
+const pdfjsPkgPath = fileURLToPath(pdfjsPkgUrl);
+
+const cMapsDir = path.join(path.dirname(pdfjsPkgPath), 'cmaps');
+
+export default {
+    entry: path.join(dirname, 'src', 'index.js'),
     output: {
-        path: path.resolve(__dirname, 'dist'),
+        path: path.resolve(dirname, 'dist'),
         filename: 'bundle.js',
     },
     resolve: {
-        modules: [path.join(__dirname, 'src'), 'node_modules'],
+        modules: [path.join(dirname, 'src'), 'node_modules'],
         alias: {
-            react: path.join(__dirname, 'node_modules', 'react'),
+            react: path.join(dirname, 'node_modules', 'react'),
         },
         extensions: ['.tsx', '.ts', '.js'],
     },
@@ -53,7 +59,7 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: path.join(__dirname, 'public', 'index.html'),
+            template: path.join(dirname, 'public', 'index.html'),
         }),
         new CopyWebpackPlugin({
             patterns: [

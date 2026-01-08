@@ -3,6 +3,7 @@
     "version": "1.0.0",
     "description": "react-fast-pdf",
     "main": "./src/index.js",
+    "type": "module",
     "files": [
         "dist",
         "src"

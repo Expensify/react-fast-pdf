@@ -1,7 +1,7 @@
 import React, {memo, type CSSProperties} from 'react';
 import {Page} from 'react-pdf';
-import {pdfPreviewerStyles as styles} from './styles';
-import {PAGE_BORDER} from './constants';
+import {pdfPreviewerStyles as styles} from './styles.js';
+import {PAGE_BORDER} from './constants.js';
 
 type Props = {
     index: number;

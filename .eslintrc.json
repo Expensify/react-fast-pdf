@@ -64,6 +64,12 @@
             "parserOptions": {
                 "project": "./tsconfig.json"
             }
+        },
+        {
+            "files": ["*"],
+            "rules": {
+                "import/extensions": ["error", "ignorePackages"]
+            }
         }
     ],
     "settings": {

@@ -1,4 +1,4 @@
-import PDFPreviewer from './PDFPreviewer';
+import PDFPreviewer from './PDFPreviewer.js';
 
 const PACKAGE_NAME = 'react-fast-pdf';
 

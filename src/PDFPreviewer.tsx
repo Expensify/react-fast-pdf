@@ -1,20 +1,18 @@
-// eslint-disable-next-line import/extensions
 import pdfWorkerSource from 'pdfjs-dist/build/pdf.worker.min.mjs';
-// eslint-disable-next-line import/extensions
 import React, {memo, useCallback, useLayoutEffect, useRef, useState} from 'react';
 import type {CSSProperties, ReactNode} from 'react';
-import times from 'lodash/times';
+import times from 'lodash/times.js';
 import {VariableSizeList as List} from 'react-window';
 import {Document, pdfjs} from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
-import type {PDFDocument, PageViewport} from './types';
-import {pdfPreviewerStyles as styles} from './styles';
-import PDFPasswordForm, {type PDFPasswordFormProps} from './PDFPasswordForm';
-import PageRenderer from './PageRenderer';
-import {PAGE_BORDER, LARGE_SCREEN_SIDE_SPACING, DEFAULT_DOCUMENT_OPTIONS, DEFAULT_EXTERNAL_LINK_TARGET, PDF_PASSWORD_FORM_RESPONSES} from './constants';
-import {setListAttributes} from './helpers';
+import type {PDFDocument, PageViewport} from './types.js';
+import {pdfPreviewerStyles as styles} from './styles.js';
+import PDFPasswordForm, {type PDFPasswordFormProps} from './PDFPasswordForm.js';
+import PageRenderer from './PageRenderer.js';
+import {PAGE_BORDER, LARGE_SCREEN_SIDE_SPACING, DEFAULT_DOCUMENT_OPTIONS, DEFAULT_EXTERNAL_LINK_TARGET, PDF_PASSWORD_FORM_RESPONSES} from './constants.js';
+import {setListAttributes} from './helpers.js';
 
 type Props = {
     file: string;
