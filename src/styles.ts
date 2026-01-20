@@ -1,4 +1,4 @@
-import type {ComponentStyles} from './types';
+import type {ComponentStyles} from './types.js';
 
 const pdfPreviewerStyles: ComponentStyles = {
     container: {

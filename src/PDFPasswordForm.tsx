@@ -1,7 +1,7 @@
 import React, {useState, useRef, useMemo, type ChangeEvent, type FormEventHandler} from 'react';
 
-import {pdfPasswordFormStyles as styles} from './styles';
-import {isSafari} from './helpers';
+import {pdfPasswordFormStyles as styles} from './styles.js';
+import {isSafari} from './helpers.js';
 
 type Props = {
     isPasswordInvalid?: boolean;

@@ -5,9 +5,12 @@ import './index.css';
 function App() {
     const [file, setFile] = useState<string | null>(null);
 
+    // `.default` is required when referencing the legacy CJS package.
+    const packageName = ('default' in ReactFastPDF ? (ReactFastPDF.default as {PackageName: string}) : ReactFastPDF).PackageName;
+
     return (
         <main className="container">
-            <h1 className="title">Hello, I am {ReactFastPDF.PackageName}!</h1>
+            <h1 className="title">Hello, I am {packageName}!</h1>
 
             {file ? (
                 <>
