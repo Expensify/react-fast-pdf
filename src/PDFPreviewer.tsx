@@ -11,7 +11,7 @@ import type {PDFDocument, PageViewport, RotationDegrees} from './types.js';
 import {pdfPreviewerStyles as styles} from './styles.js';
 import PDFPasswordForm, {type PDFPasswordFormProps} from './PDFPasswordForm.js';
 import PageRenderer from './PageRenderer.js';
-import {PAGE_BORDER, LARGE_SCREEN_SIDE_SPACING, DEFAULT_DOCUMENT_OPTIONS, DEFAULT_EXTERNAL_LINK_TARGET, PDF_PASSWORD_FORM_RESPONSES} from './constants.js';
+import {PAGE_BORDER, LARGE_SCREEN_SIDE_SPACING, DEFAULT_DOCUMENT_OPTIONS, DEFAULT_EXTERNAL_LINK_TARGET, PDF_PASSWORD_FORM_RESPONSES, ROTATION} from './constants.js';
 import {setListAttributes} from './helpers.js';
 
 type Props = {
@@ -53,7 +53,7 @@ function PDFPreviewer({
     contentContainerStyle,
     shouldShowErrorComponent = true,
     onLoadError,
-    rotation = 0,
+    rotation = ROTATION.DEG_0,
 }: Props): JSX.Element {
     const [pageViewports, setPageViewports] = useState<PageViewport[]>([]);
     const [numPages, setNumPages] = useState(0);
@@ -119,7 +119,7 @@ function PDFPreviewer({
             const {width: originalWidth, height: originalHeight} = pageViewports[pageIndex];
 
             // Swap dimensions when rotated 90 or 270 degrees
-            const isRotated90or270 = rotation === 90 || rotation === 270;
+            const isRotated90or270 = rotation === ROTATION.DEG_90 || rotation === ROTATION.DEG_270;
             const pageViewportWidth = isRotated90or270 ? originalHeight : originalWidth;
             const pageViewportHeight = isRotated90or270 ? originalWidth : originalHeight;
 
@@ -240,7 +240,12 @@ function PDFPreviewer({
             ref={containerRef}
             style={{...styles.container, ...containerStyle}}
         >
-            <div style={{...styles.innerContainer, ...(shouldRequestPassword ? styles.invisibleContainer : {})}}>
+            <div
+                style={{
+                    ...styles.innerContainer,
+                    ...(shouldRequestPassword ? styles.invisibleContainer : {}),
+                }}
+            >
                 <Document
                     file={file}
                     options={DEFAULT_DOCUMENT_OPTIONS}
@@ -262,7 +267,14 @@ function PDFPreviewer({
                             itemCount={numPages}
                             itemSize={calculatePageHeight}
                             estimatedItemSize={calculatePageHeight(0)}
-                            itemData={{pageWidth, estimatedPageHeight, calculatePageHeight, getDevicePixelRatio, containerHeight, numPages}}
+                            itemData={{
+                                pageWidth,
+                                estimatedPageHeight,
+                                calculatePageHeight,
+                                getDevicePixelRatio,
+                                containerHeight,
+                                numPages,
+                            }}
                         >
                             {PageRenderer}
                         </List>
