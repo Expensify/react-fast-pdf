@@ -35,6 +35,9 @@
         "react-dom": "^18.2.0",
         "react-fast-pdf": "^1.0.23"
     },
+    "peerDependencies": {
+        "pdfjs-dist": "^4.x || ^5.x"
+    },
     "devDependencies": {
         "@babel/cli": "^7.22.9",
         "@babel/core": "^7.22.9",

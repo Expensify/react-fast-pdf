@@ -1,9 +1,8 @@
-import pdfWorkerSource from 'pdfjs-dist/build/pdf.worker.min.mjs';
 import React, {memo, useCallback, useLayoutEffect, useRef, useState} from 'react';
 import type {CSSProperties, ReactNode} from 'react';
 import times from 'lodash/times.js';
 import {VariableSizeList as List} from 'react-window';
-import {Document, pdfjs} from 'react-pdf';
+import {Document} from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
@@ -31,8 +30,6 @@ type Props = {
 };
 
 type OnPasswordCallback = (password: string | null) => void;
-
-pdfjs.GlobalWorkerOptions.workerSrc = URL.createObjectURL(new Blob([pdfWorkerSource], {type: 'text/javascript'}));
 
 const DefaultLoadingComponent = <p>Loading...</p>;
 const DefaultErrorComponent = <p>Failed to load the PDF file :(</p>;
