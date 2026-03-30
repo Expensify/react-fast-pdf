@@ -1,7 +1,11 @@
 import React, {useState} from 'react';
+import pdfWorkerSource from 'pdfjs-dist/build/pdf.worker.min.mjs';
+import * as pdfjs from 'pdfjs-dist';
 import ReactFastPDF, {PDFPreviewer} from 'react-fast-pdf';
 import type {RotationDegrees} from 'react-fast-pdf';
 import './index.css';
+
+pdfjs.GlobalWorkerOptions.workerSrc = URL.createObjectURL(new Blob([pdfWorkerSource], {type: 'text/javascript'}));
 
 function App() {
     const [file, setFile] = useState<string | null>(null);
