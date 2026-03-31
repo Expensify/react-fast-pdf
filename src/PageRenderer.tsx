@@ -12,21 +12,19 @@ type Props = {
         calculatePageHeight: (pageIndex: number) => number;
         getDevicePixelRatio: (width: number, height: number) => number | undefined;
         numPages: number;
-        containerHeight: number;
     };
 };
 
 function PageRenderer({index, style, data}: Props) {
-    const {pageWidth, estimatedPageHeight, calculatePageHeight, getDevicePixelRatio, numPages, containerHeight} = data;
+    const {pageWidth, estimatedPageHeight, calculatePageHeight, getDevicePixelRatio, numPages} = data;
     /**
      * Render a specific page based on its index.
      * The method includes a wrapper to apply virtualized styles.
      */
     const pageHeight = calculatePageHeight(index);
     const devicePixelRatio = getDevicePixelRatio(pageWidth, pageHeight);
-    const parsedHeight = parseFloat(style.height as unknown as string);
     const parsedTop = parseFloat(style.top as unknown as string);
-    const topPadding = numPages > 1 || parsedHeight > containerHeight ? parsedTop + PAGE_BORDER : (containerHeight - parsedHeight) / 2;
+    const topPadding = numPages === 1 ? parsedTop : parsedTop + PAGE_BORDER;
     return (
         <div style={{...styles.pageWrapper, ...style, top: `${topPadding}px`}}>
             <Page

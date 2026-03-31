@@ -27,7 +27,6 @@ type Props = {
     onLoadError?: () => void;
     containerStyle?: CSSProperties;
     contentContainerStyle?: CSSProperties;
-    /** Rotation angle for all pages (0, 90, 180, 270 degrees) */
     rotation?: RotationDegrees;
 };
 
@@ -216,6 +215,14 @@ function PDFPreviewer({
         }
     }, [containerWidth, containerHeight, rotation]);
 
+    /**
+     * Scroll back to the top whenever rotation changes so the list offset
+     * is consistent regardless of how page dimensions change.
+     */
+    useLayoutEffect(() => {
+        listRef.current?.scrollTo(0);
+    }, [rotation]);
+
     useLayoutEffect(() => {
         if (!containerRef.current) {
             return undefined;
@@ -260,7 +267,7 @@ function PDFPreviewer({
                             style={{...styles.list, ...contentContainerStyle}}
                             outerRef={setListAttributes}
                             width={isSmallScreen ? pageWidth : containerWidth}
-                            height={containerHeight}
+                            height={numPages === 1 && estimatedPageHeight < containerHeight ? estimatedPageHeight : containerHeight}
                             itemCount={numPages}
                             itemSize={calculatePageHeight}
                             estimatedItemSize={calculatePageHeight(0)}
@@ -269,7 +276,6 @@ function PDFPreviewer({
                                 estimatedPageHeight,
                                 calculatePageHeight,
                                 getDevicePixelRatio,
-                                containerHeight,
                                 numPages,
                             }}
                         >
