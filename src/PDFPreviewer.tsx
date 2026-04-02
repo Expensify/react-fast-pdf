@@ -6,7 +6,7 @@ import {Document} from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
-import type {PDFDocument, PageViewport} from './types.js';
+import type {PDFDocument, PageViewport, RotationDegrees} from './types.js';
 import {pdfPreviewerStyles as styles} from './styles.js';
 import PDFPasswordForm, {type PDFPasswordFormProps} from './PDFPasswordForm.js';
 import PageRenderer from './PageRenderer.js';
@@ -27,6 +27,7 @@ type Props = {
     onLoadError?: () => void;
     containerStyle?: CSSProperties;
     contentContainerStyle?: CSSProperties;
+    rotation?: RotationDegrees;
 };
 
 type OnPasswordCallback = (password: string | null) => void;
@@ -48,7 +49,8 @@ function PDFPreviewer({
     contentContainerStyle,
     shouldShowErrorComponent = true,
     onLoadError,
-}: Props) {
+    rotation = 0,
+}: Props): JSX.Element {
     const [pageViewports, setPageViewports] = useState<PageViewport[]>([]);
     const [numPages, setNumPages] = useState(0);
     const [containerWidth, setContainerWidth] = useState(0);
@@ -100,6 +102,7 @@ function PDFPreviewer({
      * Calculates a proper page height. The method should be called only when there are page viewports.
      * It is based on a ratio between the specific page viewport width and provided page width.
      * Also, the app should take into account the page borders.
+     * When rotation is 90 or 270 degrees, width and height are swapped.
      */
     const calculatePageHeight = useCallback(
         (pageIndex: number) => {
@@ -109,12 +112,18 @@ function PDFPreviewer({
 
             const pageWidth = calculatePageWidth();
 
-            const {width: pageViewportWidth, height: pageViewportHeight} = pageViewports[pageIndex];
+            const {width: originalWidth, height: originalHeight} = pageViewports[pageIndex];
+
+            // Swap dimensions when rotated 90 or 270 degrees
+            const isRotated90or270 = rotation === 90 || rotation === 270;
+            const pageViewportWidth = isRotated90or270 ? originalHeight : originalWidth;
+            const pageViewportHeight = isRotated90or270 ? originalWidth : originalHeight;
+
             const scale = pageWidth / pageViewportWidth;
 
             return pageViewportHeight * scale + PAGE_BORDER * 2;
         },
-        [pageViewports, calculatePageWidth],
+        [pageViewports, calculatePageWidth, rotation],
     );
 
     const estimatedPageHeight = calculatePageHeight(0);
@@ -204,7 +213,15 @@ function PDFPreviewer({
         if (containerWidth > 0 && containerHeight > 0) {
             listRef.current?.resetAfterIndex(0);
         }
-    }, [containerWidth, containerHeight]);
+    }, [containerWidth, containerHeight, rotation]);
+
+    /**
+     * Scroll back to the top whenever rotation changes so the list offset
+     * is consistent regardless of how page dimensions change.
+     */
+    useLayoutEffect(() => {
+        listRef.current?.scrollTo(0);
+    }, [rotation]);
 
     useLayoutEffect(() => {
         if (!containerRef.current) {
@@ -227,7 +244,12 @@ function PDFPreviewer({
             ref={containerRef}
             style={{...styles.container, ...containerStyle}}
         >
-            <div style={{...styles.innerContainer, ...(shouldRequestPassword ? styles.invisibleContainer : {})}}>
+            <div
+                style={{
+                    ...styles.innerContainer,
+                    ...(shouldRequestPassword ? styles.invisibleContainer : {}),
+                }}
+            >
                 <Document
                     file={file}
                     options={DEFAULT_DOCUMENT_OPTIONS}
@@ -235,6 +257,7 @@ function PDFPreviewer({
                     error={shouldShowErrorComponent ? ErrorComponent : null}
                     onLoadError={onLoadError}
                     loading={LoadingComponent}
+                    rotate={rotation}
                     onLoadSuccess={onDocumentLoadSuccess}
                     onPassword={initiatePasswordChallenge}
                 >
@@ -244,11 +267,17 @@ function PDFPreviewer({
                             style={{...styles.list, ...contentContainerStyle}}
                             outerRef={setListAttributes}
                             width={isSmallScreen ? pageWidth : containerWidth}
-                            height={containerHeight}
+                            height={numPages === 1 && estimatedPageHeight < containerHeight ? estimatedPageHeight : containerHeight}
                             itemCount={numPages}
                             itemSize={calculatePageHeight}
                             estimatedItemSize={calculatePageHeight(0)}
-                            itemData={{pageWidth, estimatedPageHeight, calculatePageHeight, getDevicePixelRatio, containerHeight, numPages}}
+                            itemData={{
+                                pageWidth,
+                                estimatedPageHeight,
+                                calculatePageHeight,
+                                getDevicePixelRatio,
+                                numPages,
+                            }}
                         >
                             {PageRenderer}
                         </List>
@@ -261,6 +290,6 @@ function PDFPreviewer({
     );
 }
 
-PDFPasswordForm.displayName = 'PDFPreviewer';
+PDFPreviewer.displayName = 'PDFPreviewer';
 
 export default memo(PDFPreviewer);

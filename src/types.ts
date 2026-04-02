@@ -18,4 +18,9 @@ type ComponentStyles = {
     [key: string]: CSSProperties;
 };
 
-export type {PDFDocument, PageViewport, ComponentStyles};
+/**
+ * Valid rotation angles for PDF pages (in degrees clockwise)
+ */
+type RotationDegrees = 0 | 90 | 180 | 270;
+
+export type {PDFDocument, PageViewport, ComponentStyles, RotationDegrees};
