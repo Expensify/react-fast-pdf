@@ -16,7 +16,7 @@ const LARGE_SCREEN_SIDE_SPACING = 40;
  * 2. cMapPacked - specifies if the Adobe CMaps are binary packed or not. The default value is `true`.
  */
 const DEFAULT_DOCUMENT_OPTIONS = {
-    cMapUrl: 'cmaps/',
+    cMapUrl: '/cmaps/',
     cMapPacked: true,
 };
 
