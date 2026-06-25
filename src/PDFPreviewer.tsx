@@ -3,6 +3,7 @@ import type {CSSProperties, ReactNode} from 'react';
 import times from 'lodash/times.js';
 import {VariableSizeList as List} from 'react-window';
 import {Document} from 'react-pdf';
+import type {DocumentProps} from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
@@ -28,6 +29,7 @@ type Props = {
     containerStyle?: CSSProperties;
     contentContainerStyle?: CSSProperties;
     rotation?: RotationDegrees;
+    options?: DocumentProps['options'];
 };
 
 type OnPasswordCallback = (password: string | null) => void;
@@ -50,6 +52,7 @@ function PDFPreviewer({
     shouldShowErrorComponent = true,
     onLoadError,
     rotation = 0,
+    options = DEFAULT_DOCUMENT_OPTIONS,
 }: Props): JSX.Element {
     const [pageViewports, setPageViewports] = useState<PageViewport[]>([]);
     const [numPages, setNumPages] = useState(0);
@@ -252,7 +255,7 @@ function PDFPreviewer({
             >
                 <Document
                     file={file}
-                    options={DEFAULT_DOCUMENT_OPTIONS}
+                    options={options}
                     externalLinkTarget={DEFAULT_EXTERNAL_LINK_TARGET}
                     error={shouldShowErrorComponent ? ErrorComponent : null}
                     onLoadError={onLoadError}
