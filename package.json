@@ -73,5 +73,17 @@
   "engines": {
     "node": ">=20.10.0",
     "npm": ">=10.2.3"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": ">=24.19.0",
+      "onFail": "error"
+    },
+    "packageManager": {
+      "name": "npm",
+      "version": ">=11.10.0",
+      "onFail": "error"
+    }
   }
 }
