@@ -26,10 +26,14 @@ type Props = {
     ErrorComponent?: ReactNode;
     shouldShowErrorComponent?: boolean;
     onLoadError?: () => void;
+    /** Called once every page has been measured and the pages are ready to display */
+    onLoadSuccess?: () => void;
     containerStyle?: CSSProperties;
     contentContainerStyle?: CSSProperties;
     rotation?: RotationDegrees;
     options?: DocumentProps['options'];
+    /** 1-indexed page to scroll to. The previewer scrolls whenever it changes, including once the document loads. */
+    page?: number;
 };
 
 type OnPasswordCallback = (password: string | null) => void;
@@ -51,8 +55,10 @@ function PDFPreviewer({
     contentContainerStyle,
     shouldShowErrorComponent = true,
     onLoadError,
+    onLoadSuccess,
     rotation = 0,
     options = DEFAULT_DOCUMENT_OPTIONS,
+    page,
 }: Props): JSX.Element {
     const [pageViewports, setPageViewports] = useState<PageViewport[]>([]);
     const [numPages, setNumPages] = useState(0);
@@ -63,6 +69,12 @@ function PDFPreviewer({
     const containerRef = useRef<HTMLDivElement>(null);
     const onPasswordCallbackRef = useRef<OnPasswordCallback | null>(null);
     const listRef = useRef<List>(null);
+
+    // Measuring every page can take seconds, so call the latest callback rather than the one from when loading began
+    const onLoadSuccessRef = useRef(onLoadSuccess);
+    useLayoutEffect(() => {
+        onLoadSuccessRef.current = onLoadSuccess;
+    }, [onLoadSuccess]);
 
     /**
      * Calculate the devicePixelRatio the page should be rendered with
@@ -143,7 +155,7 @@ function PDFPreviewer({
             times(pdf.numPages, (index: number) => {
                 const pageNumber = index + 1;
 
-                return pdf.getPage(pageNumber).then((page) => page.getViewport({scale: 1}));
+                return pdf.getPage(pageNumber).then((pdfPage) => pdfPage.getViewport({scale: 1}));
             }),
         ).then(
             (viewports: PageViewport[]) => {
@@ -151,6 +163,7 @@ function PDFPreviewer({
                 setNumPages(pdf.numPages);
                 setShouldRequestPassword(false);
                 setIsPasswordInvalid(false);
+                onLoadSuccessRef.current?.();
             },
             () => {},
         );
@@ -225,6 +238,16 @@ function PDFPreviewer({
     useLayoutEffect(() => {
         listRef.current?.scrollTo(0);
     }, [rotation]);
+
+    /**
+     * Keep the requested page aligned to the top. Re-runs after load and resizes because page offsets change then.
+     */
+    useLayoutEffect(() => {
+        if (!page || pageViewports.length === 0) {
+            return;
+        }
+        listRef.current?.scrollToItem(page - 1, 'start');
+    }, [page, pageViewports.length, containerWidth, containerHeight, rotation]);
 
     useLayoutEffect(() => {
         if (!containerRef.current) {
