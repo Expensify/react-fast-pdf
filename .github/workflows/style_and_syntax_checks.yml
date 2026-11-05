@@ -17,6 +17,7 @@ jobs:
               uses: actions/setup-node@1a4442cacd436585916779262731d5b162bc6ec7
               with:
                   node-version-file: '.nvmrc'
+                  check-latest: true
                   cache: npm
 
             - name: Install dependencies
